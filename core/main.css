@@ -1,0 +1,410 @@
+preview
+*{
+    -webkit-tap-highlight-color: transparent;
+}
+@font-face {
+        font-family: "OpenSans";
+        src: url("/static/font/OpenSans.ttf");
+}
+
+body, input{
+  border-top: 1px solid #ccc;
+  font: 1em 'OpenSans', sans-serif;
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+  box-sizing: border-box;
+}
+form input, form textarea, form select, button {
+	color: #000;
+	background: none;
+	font: 1em 'OpenSans', sans-serif;
+	outline: none;
+	border: none;
+}
+form input, form textarea, .content h2, .content p {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+}
+
+form input[type="submit"] {
+     -webkit-appearance: none;
+
+	width: auto;
+	cursor: pointer;
+	padding: 0.5em;
+	border-radius: 2rem;
+	display: inline-block;
+}
+label {
+	cursor: pointer;
+}
+input[type=checkbox]{
+	display: none;
+}
+form input[type="checkbox"] {
+	width: 1em;
+}
+textarea {
+	resize: vertical;
+}
+input[type="file"] {
+	display: none;
+}
+h1, h2, h3 {
+	margin: 0;
+}
+h1 {
+    cursor: default;
+	font-size: 1.25em;
+}
+h2 {
+	font-size: 1.125em;
+}
+h3 {
+	font-size: 1em;
+}
+li {
+	line-height:1.25em;
+	padding: .25em 0;
+}
+pre {
+   font-family: "courier new", courier, monospace;
+   font-size: .95em;
+   -moz-tab-size: 3;
+   tab-size: 3;
+   white-space: pre-wrap;
+}
+a {
+	text-decoration: none;
+}
+
+nav {
+	transition: .25s ease-out margin;
+	overflow-y: auto;
+	overflow-x: hidden;
+
+	position: absolute;
+	height:100vh;
+	width:3.5rem;
+
+	display: flex;
+	flex-flow: column;
+	justify-content: space-between;
+
+	z-index: 11;
+	transition: 0.25s ease width;
+
+	background: #fff;
+	border-right: 1px solid #000;
+
+	font-weight: bold;
+}
+nav.on, nav div {
+	width: 13.5em;
+}
+
+nav a:link, nav a:visited {
+	color: #000;
+}
+nav a, nav span {
+	white-space: nowrap;
+	cursor: pointer;
+	transition: .25s ease border-color, .125s linear color;
+	display: flex;
+	align-items: center;
+}
+nav a:before, nav span:before, button.icon:before, .button.icon:before {
+	display: block;
+	width: 1.5rem;
+	height: 1.5rem;
+	background: url('../../ui/media/icons.svg');
+	content: '';
+	margin: 0 auto;
+}
+nav a::before, nav span::before {
+	margin: 1rem;
+}
+nav a:hover {
+	color: #222;
+}
+
+/*Icons*/
+.button#edit::before {
+	background-position: left calc(-1.5rem*25) top;
+}
+.button#storage::before {
+	background-position: left calc(-1.5rem*26) top;
+}
+#dashboard.on .button#edit::before {
+	background-position: left calc(-1.5rem*25) bottom;
+}
+.button#add:before, button#add:before, button#raise:before {
+	background-position: left calc(-1.5rem*23) top;
+}
+button#remove:before {
+	background-position: left calc(-1.5rem*3) top;
+}
+button#lower:before {
+	background-position: left calc(-1.5rem*24) top;
+}
+
+
+section {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+}
+
+.header {
+	display: flex;
+    justify-content: space-between;
+    align-items: center;
+	padding: .25rem .25rem .25rem .5rem;
+	font-weight: bold;
+    height: 3rem;
+	overflow: hidden;
+}
+button.icon, .button.icon {
+    border-radius: 2rem;
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: #000;
+    padding: .25rem;
+    transition: border-color ease .125s;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+}
+button.icon:hover {
+	border: 1px solid #000;
+}
+button.noicon {
+	border: none;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+}
+section #dashboard {
+	display: flex;
+	height: 100vh;
+}
+
+section #dashboard #grid{
+	transition: .25s ease width;
+	width: 100%
+}
+section #dashboard #workspaces{
+	transition: .25s ease width;
+	width: 4rem;
+}
+#grid {
+	grid-column: 1;
+	grid-row: 1;
+}
+#workspaces {
+	grid-column: 2;
+	grid-row: 1;
+}
+#workspaces > div {
+    overflow-y: auto;
+    display: block;
+    height: calc(100vh - 7rem);
+}
+#workspaces span > div, #workspaces #edit, #workspaces #add{
+	box-sizing: border-box;
+  height: 3rem;
+	margin:.25em;
+	overflow: hidden;
+
+	padding:.25em;
+	border: 1px solid #222;
+	border-radius: .25em;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	transition: .25s ease background-color;
+}
+#workspaces span > div.on {
+	background: #4499cc
+}
+#workspaces span > div.on button{
+	filter: invert(1) ;
+}
+#workspaces span h3 {
+    width: 100%;
+    height: 100%;
+	cursor: pointer;
+}
+#dashboard button#remove, #dashboard #add {
+	display: none
+}
+#dashboard.on #workspaces {
+	width: 8rem;
+}
+#dashboard.on button#remove {
+	display: block
+}
+#dashboard.on #add {
+  display:flex
+}
+#grid #add {
+	z-index: 1;
+	display: block !important;
+    position: absolute;
+    right: 8rem;
+    bottom: -5em;
+    border: 1px solid #000;
+    padding: .75em;
+	margin-bottom: 0;
+	transition: .25s ease box-shadow, .25s ease margin-bottom, .25s ease bottom;
+}
+#grid #remove {
+    position: absolute;
+    border: 1px solid #000;
+    padding: .5em;
+	margin: .5em;
+	transition: .25s ease box-shadow;
+}
+#grid #remove:hover {
+	box-shadow: 0 0 .25em rgba(0, 0, 0, 0.5);
+}
+#grid {
+	overflow: hidden;
+	display: flex
+}
+section #dashboard.on #grid #add {
+    bottom: .5em;
+}
+#grid #add:hover {
+	margin-bottom: .25em;
+    box-shadow: 0 .125em .25em rgba(0, 0, 0, 0.5);
+}
+#grid > span {
+	display: grid;
+	gap: 1px;
+	height: 100%;
+	width: 100%;
+}
+#grid > span > div {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	border: 1px solid #000;
+}
+#grid span video {
+	width: 100%;
+    height: 100%;
+}
+#grid button {
+	background: #fff;
+	z-index: 1;
+}
+#grid #actions, #grid  > span {
+	transition: .25s ease width;
+}
+#grid #actions {
+	width: 0;
+	border-left: 1px solid #ccc;
+	box-sizing: border-box;
+}
+#grid #actions button.noicon{
+	margin: 0;
+	width: 100%;
+	padding: .5em 0;
+	background: transparent !important;
+}
+#grid #actions > span > div {
+	border: 1px solid #000;
+	border-radius: .5em;
+	margin: .125em 0 .125em 0;
+	width: 100%;
+}
+#grid #actions .button, #grid #actions .switch {
+    transition: box-shadow ease .125s, .125s ease background-color, margin ease .125s;
+}
+#actions .range button {
+	margin: 0.5em 0.25em 0 0.25em !important;
+}
+#actions .range button:hover {
+	box-shadow: 0 0 0.25em rgba(0, 0, 0, 0.5);
+}
+#actions .range button:active {
+	box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+#grid #actions .button:hover, #grid #actions .switch:hover {
+    margin: 0 0 0.25em 0;
+    box-shadow: 0 .125em .125em rgba(0, 0, 0, 0.5);
+}
+#grid #actions .switch.on {
+	background: #3298dc;
+}
+#grid #actions .switch.on button {
+	color: #fff
+}
+#grid #actions .range {
+    width: 100%;
+	display: block;
+	padding: .5em;
+	text-align: center;
+	box-sizing: border-box;
+}
+#grid #actions input {
+	border: none;
+	border-bottom: 1px solid #000;
+    width: 100%;
+	text-align: center;
+
+}
+#grid #actions > span > div:active {
+    margin: .125em 0 .125em 0 !important;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0)  !important;
+}
+#grid #actions > span {
+	display: block;
+	width: 8rem;
+	padding: 0.5rem;
+	box-sizing:border-box;
+	display: flex;
+    flex-direction: column;
+
+    height: 100vh;
+	overflow-x: hidden;
+    overflow-y: auto;
+	scrollbar-width: none;
+}
+#grid.on > span {
+	width: calc(100% - 8em);
+}
+#grid.on #actions {
+	width: 8em;
+}
+#grid > span > div {
+    transition: box-shadow ease .125s;
+}
+#grid > span > div.on {
+	box-shadow:  0 0 1em rgba(68, 153, 204, 1);
+	border-color: #3298dc;
+	z-index: 10
+}
+
+#grid span.s1 {
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+}
+#grid span.s2 {
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr;
+}
+#grid span.s3, #grid span.s4 {
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr 1fr;
+}
+#grid span.s5, #grid span.s6 {
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-rows: 1fr 1fr;
+}
+#grid span.s7, #grid span.s8, #grid span.s9 {
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-rows: 1fr 1fr 1fr;
+}
