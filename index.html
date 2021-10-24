@@ -7,9 +7,17 @@
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script type="text/javascript" src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
 	<script>
-		let modulesNames = [],
-	    modules = []
+		var modulesNames = [],
+	    modules = {},
+	    section,
+	    inited = false
 		modulesNames.push('DataStorage', 'Workspaces')
+
+    function initDataboard () {
+      modules.Workspaces.init()
+	    modules.DataStorage.init(modules.Workspaces.grid)
+	    inited = true
+	  }
 	</script>
 </head>
 

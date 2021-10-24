@@ -5,12 +5,10 @@ import {Actions, Action, Charts} from './action.js'
 import {DOM} from './dom.js'
 import {DataStorage} from './datastorage.js'
 
-let section,
-	navigation
+let section
 
-window.onload = ()=>{
+window.onload = () => {
 	section = get('section')
-  modules = {}
 	modulesNames.forEach ((module) => {
 		eval(`modules.${module} = new ${module}()`)
 	});
@@ -346,7 +344,8 @@ class Workspaces{
 		$.workspaces.append([$.wrapper, $.wrapper2])
 
 		this.grid = new Grid($.grid)
-
+	}
+	init (){
     this.restore()
 
 		if (typeof localStorage['currentWorkspace'] != 'undefined')

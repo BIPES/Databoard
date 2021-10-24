@@ -6,10 +6,13 @@ class DataStorage {
   constructor (){
     this._data = []
     this._keys = []
+    this.gridObj
   }
-  init (dataStorage) {
-    this._data = dataStorage
-    this._keys = Object.keys(dataStorage)
+  init (gridObj) {
+    //this._data = dataStorage
+    //this._keys = Object.keys(dataStorage)
+
+    this.gridObj = gridObj
   }
   push (dataset, coordinates) {
     if (coordinates.constructor.name != 'Array')
@@ -92,14 +95,16 @@ class DataStorage {
   }
 
   chartPush (dataset, coordinates) {
-    modules.Workspaces.grid.charts.forEach ((chart) => {
-      if (chart.dataset == dataset) {
-        chart.data.labels.push(coordinates[0])
-        chart.data.datasets.forEach((dataset, index) => {
-          dataset.data.push(coordinates[index])
-        })
-        chart.update()
-      }
-    })
+    if (this.gridObj != undefined) {
+      this.gridObj.charts.forEach ((chart) => {
+        if (chart.dataset == dataset) {
+          chart.data.labels.push(coordinates[0])
+          chart.data.datasets.forEach((dataset, index) => {
+            dataset.data.push(coordinates[index + 1])
+          })
+          chart.update()
+        }
+      })
+    }
   }
 }
