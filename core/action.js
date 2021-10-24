@@ -50,6 +50,10 @@ class Actions {
           chartType: {
             type: 'input',
             value: 'line'
+          },
+          labels: {
+            type: 'input',
+            value: 'Variable 1, Variable 2'
           }
         }
 	      break
@@ -60,7 +64,8 @@ class Actions {
 	  let _dict = {
 	    'chart.js': {
 	      dataset: 'Dataset',
-	      chartType: 'Chart type'
+	      chartType: 'Chart type',
+	      labels: 'Labels'
 	    },
 	    'dash.js': {
 	      manifest: 'Stream source'
@@ -115,14 +120,7 @@ class Action {
               data.setup.dataset.value = str,
           		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
 
-              for (const index in obj.charts) {
-                if (obj.charts[index].uid == this.uid) {
-			            obj.charts[index].destroy()
-                  obj.charts[index] = Charts.chart(this.uid, this.dom)
-			            obj.charts[index].uid = this.uid
-			            obj.charts[index].dataset = str
-			          }
-			        }
+          		Charts.regen(obj, data.setup.dataset.value, this.uid, this.dom)
 			        break
 			      case 'chartType':
         			if(!(['line','bar','pie','radar'].includes(str)))
@@ -130,17 +128,16 @@ class Action {
               data.setup.chartType.value = str,
           		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
 
-              for (const index in obj.charts) {
-                if (obj.charts[index].uid == this.uid) {
-                  let dataset = obj.charts[index].dataset
-			            obj.charts[index].destroy()
-                  obj.charts[index] = Charts.chart(this.uid, this.dom)
-			            obj.charts[index].uid = this.uid
-			            obj.charts[index].dataset = dataset
-			          }
-			        }
+          		Charts.regen(obj, data.setup.dataset.value, this.uid, this.dom)
+			        break
+			      case 'labels':
+			        data.setup.labels.value = str
+          		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
+
+          		Charts.regen(obj, data.setup.dataset.value, this.uid, this.dom)
 			        break
 			    break
+			  }
 			  case 'dash.js':
 			    switch (this.key){
 			      case 'manifest':
@@ -155,9 +152,8 @@ class Action {
 			        }
 			    }
 			}
-    }
 	}
-	switch (request) {
+	switchState (request) {
 		let switch_ = this.currentValue == 1 ? 0 : 1
 
 	}
@@ -181,7 +177,7 @@ class Charts {
   constructor (){}
   static chart (uid, dom) {
 		let data = JSON.parse(localStorage[`stream:${uid}`])
-		let data2 = modules.DataStorage.chartData(data.setup.dataset.value);
+		let data2 = modules.DataStorage.chartData(data.setup.dataset.value, data);
 
     return new Chart(dom, {
 		        type: data.setup.chartType.value,
@@ -192,8 +188,22 @@ class Charts {
                         beginAtZero: true
                     }
                   },
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                animation: {
+                  duration: 0
+                },
+                resizeDelay: 125
             }
 		      })
+  }
+  static regen (obj, datasetName, uid, dom) {
+    for (const index in obj.charts) {
+      if (obj.charts[index].uid == uid) {
+        obj.charts[index].destroy()
+        obj.charts[index] = Charts.chart(uid, dom)
+        obj.charts[index].uid = uid
+        obj.charts[index].dataset = datasetName
+      }
+    }
   }
 }
