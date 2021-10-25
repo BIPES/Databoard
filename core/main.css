@@ -150,8 +150,18 @@ button#remove:before {
 button#lower:before {
 	background-position: left calc(-1.5rem*24) top;
 }
-
-
+button#upload:before {
+	background-position: left calc(-1.5rem*2) top;
+}
+button#download:before {
+  background-position: left calc(-1.5rem*1) top;
+}
+.button#gridView:before {
+  background-position: left calc(-1.5rem*27) top;
+}
+#dashboard.scrollView .button#gridView:before {
+  background-position: left calc(-1.5rem*27) bottom;
+}
 section {
 	position: absolute;
 	width: 100vw;
@@ -159,13 +169,13 @@ section {
 }
 
 .header {
-	display: flex;
-    justify-content: space-between;
-    align-items: center;
-	padding: .25rem .25rem .25rem .5rem;
-	font-weight: bold;
-    height: 3rem;
-	overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .25rem .25rem .25rem .5rem;
+  font-weight: bold;
+  height: 3rem;
+  overflow: hidden;
 }
 button.icon, .button.icon {
     border-radius: 2rem;
@@ -212,7 +222,7 @@ section #dashboard #workspaces{
 #workspaces > div {
     overflow-y: auto;
     display: block;
-    height: calc(100vh - 7rem);
+    height: calc(100vh - 10rem);
 }
 #workspaces span > div, #workspaces #edit, #workspaces #add{
 	box-sizing: border-box;
@@ -230,17 +240,17 @@ section #dashboard #workspaces{
 	transition: .25s ease background-color;
 }
 #workspaces span > div.on {
-	background: #4499cc
+	background: #3298dc;
 }
 #workspaces span > div.on button{
 	filter: invert(1) ;
 }
 #workspaces span h3 {
-    width: 100%;
-    height: 100%;
+  min-width: 3em;
+  height: 100%;
 	cursor: pointer;
 }
-#dashboard button#remove, #dashboard #add {
+#grid button#remove, #dashboard #add {
 	display: none
 }
 #dashboard.on #workspaces {
@@ -251,6 +261,31 @@ section #dashboard #workspaces{
 }
 #dashboard.on #add {
   display:flex
+}
+
+#dashboard.scrollView #grid > span {
+  background-color: #fff;
+}
+#dashboard.scrollView #grid > span {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#dashboard.scrollView #grid > span > div {
+  max-width: 75em;
+  max-height: 75vh;
+  margin: 1em auto;
+  border-radius: 1em;
+  border: 1px solid #ddd;
+  width: 90%;
+  height: 75vw;
+}
+#dashboard.scrollView #grid.on > span > div {
+  /*width: calc(90vw - 11em) !important;*/
+}
+#dashboard.scrollView #grid #remove {
+  position: relative;
+  margin: 0 0 -2.75em 0;
 }
 #grid #add {
 	z-index: 12;
@@ -425,4 +460,59 @@ section #dashboard.on #grid #add {
 #grid span.s7, #grid span.s8, #grid span.s9 {
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-template-rows: 1fr 1fr 1fr;
+}
+
+#storageManager {
+  display: none;
+  position: absolute;
+  width: 100vw;
+  height: 100%;
+  background: rgba(0,0,0,0);
+  z-index:12;
+  transition: background-color ease .25s;
+}
+#storageManager.on, #storageManager.ani{
+  display: block;
+}
+#storageManager.on {
+  background: rgba(0,0,0,.2);
+}
+#storageManager > div {
+  margin: 0 auto;
+  max-width: 30em;
+  max-height: 40em;
+  background: #fff;
+  box-shadow: 0 .25em .5em rgba(0,0,0,0.5);
+  border-radius: 1em;
+  margin-top: 110vh;
+  opacity: 0;
+  transition: margin-top ease .25s, opacity ease .25s;
+  padding: 0.5em 1em 1em 1em;
+  box-sizing: border-box;
+}
+#storageManager.on > div {
+  margin-top: 10vh;
+  opacity: 1;
+}
+#storageManager span > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  padding: 0.25em 0;
+}
+#storageManager span > div:last-child {
+  border-bottom: none;
+}
+#storageManager span {
+  border: 1px solid #aaa;
+  display: block;
+  padding: 0 .5em;
+  border-radius: 1em;
+}
+#storageManager h2 {
+  font-weight: normal
+}
+#storageManager span > div > div {
+  display: flex;
 }

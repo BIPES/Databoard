@@ -3,7 +3,7 @@
 
 import {Actions, Action, Charts} from './action.js'
 import {DOM} from './dom.js'
-import {DataStorage} from './datastorage.js'
+import {DataStorage, StorageManager} from './datastorage.js'
 
 let section
 
@@ -25,31 +25,11 @@ function UID () {
  return (+new Date).toString(36) + Math.random().toString(36).substr(2)
 }
 
-function switchState (dom){
-	dom.className = dom.className == 'on' ? '' : 'on'
-}
+function switchState (dom, str){
+  str = str == undefined ? 'on' : str
 
-function handleLink (e){
-	e.preventDefault ()
-
-	let href = this.href,
-		loc = window.location.host,
-		reg = new RegExp (`${loc}/(.*)`)
-
-	if (reg.test(href)) {
-		let path = href.match(reg)[1].split('/')
-		switch (path [0]){
-			case 'logout':
-				window.open ('/logout', '_self')
-				break
-		}
-		path.forEach ((subpath) => {
-			console.log(subpath)
-			//...Handle path requests//
-		})
-	} else {
-		window.open (href, '_blank')
-	}
+  let _c = dom.className
+  dom.className = _c.search(str) == -1 ? `${_c} ${str}`.trim() : _c.replace(str, '')
 }
 
 class Grid {
@@ -201,16 +181,18 @@ class Grid {
 		switch (data.type) {
 		  case 'dash.js':
 		    this.players.forEach((player, index) => {
-			    if (player.uid == uid)
+			    if (player.uid == uid) {
 				    player.destroy()
-			    this.players.splice(index,1)
+			      this.players.splice(index,1)
+			    }
 		    })
 		    break
 		  case 'chart.js':
 		    this.charts.forEach((chart, index) => {
-		      if(chart.uid == uid)
+		      if(chart.uid == uid) {
 		        chart.destroy()
-		      this.charts.splice(index,1)
+		        this.charts.splice(index,1)
+		      }
 		    })
 		    break
 		}
@@ -313,10 +295,12 @@ class Workspaces{
 		$.dashboard = new DOM('div', {'id':'dashboard'})
 		$.grid = new DOM('div', {'id':'grid'})
 		$.workspaces = new DOM('div', {'id':'workspaces'})
+		$.storageManager = new DOM('div', {'id':'storageManager'})
 
 		$.dashboard.append ([
 			$.grid,
-			$.workspaces
+			$.workspaces,
+			$.storageManager
 			])
 
 		section.append ($.dashboard._dom)
@@ -337,13 +321,22 @@ class Workspaces{
 			'className':'button icon notext',
 			'id':'storage',
 			'title':'Edit stored data'
-		})
+		  })
+		$.gridView = new DOM('div', {
+			'className':'button icon notext',
+			'id':'gridView',
+			'title':'Switch view type'
+		  })
+		  .onclick(this, this.gridView)
+
 		$.container = new DOM('span')
 		$.wrapper = new DOM('div').append([$.container, $.add])
-		$.wrapper2 = new DOM('span').append([$.storage, $.edit])
+		$.wrapper2 = new DOM('span').append([$.gridView, $.storage, $.edit])
 		$.workspaces.append([$.wrapper, $.wrapper2])
 
 		this.grid = new Grid($.grid)
+		this.storageManager = new StorageManager($.storageManager, this.grid)
+		$.storage.onclick (this.storageManager, this.storageManager.open);
 	}
 	init (){
     this.restore()
@@ -365,6 +358,9 @@ class Workspaces{
 	edit (){
 	  switchState(this._dom.dashboard._dom)
 	}
+	gridView (){
+	  switchState(this._dom.dashboard._dom, 'scrollView')
+	}
 	add (){
 		let uid = UID ()
 		localStorage.setItem (`workspace:${uid}`,'')
@@ -372,8 +368,8 @@ class Workspaces{
 		this.show(uid)
 	}
 	include (uid){
-		let h3 = new DOM('h3', {'innerText':''});
-		h3.onclick(this, this.show, [uid]);
+		let h3 = new DOM('h3', {'innerText':''})
+		  .onclick(this, this.show, [uid])
 		let remove = new DOM('button', {
 			'className':'icon notext',
 			'id':'remove',

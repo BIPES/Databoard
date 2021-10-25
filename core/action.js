@@ -123,7 +123,7 @@ class Action {
           		Charts.regen(obj, data.setup.dataset.value, this.uid, this.dom)
 			        break
 			      case 'chartType':
-        			if(!(['line','bar','pie','radar'].includes(str)))
+        			if(!(['line','bar','pie','radar', 'scatter'].includes(str)))
 			          return
               data.setup.chartType.value = str,
           		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
@@ -195,6 +195,12 @@ class Charts {
                 resizeDelay: 125
             }
 		      })
+  }
+  static colors (i) {
+    let bgc = ['rgba(106,168,251,0.8)', 'rgba(123,73,173,0.8)', 'rgba(106,251,116,0.8)', 'rgba(251,106,106,0.8', 'rgba(56,95,70,0.8)', 'rgba(318,95,70,0.8)']
+    let bdc = ['rgba(106,168,251,1.0)', 'rgba(123,73,173,1.0)', 'rgba(106,251,116,1.0)', 'rgba(251,106,106,1.0', 'rgba(56,95,70,1.0)', 'rgba(318,95,70,1.0)']
+
+    return bgc[i], bdc[i]
   }
   static regen (obj, datasetName, uid, dom) {
     for (const index in obj.charts) {

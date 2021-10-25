@@ -10,13 +10,24 @@
 		var modulesNames = [],
 	    modules = {},
 	    section,
-	    inited = false
+	    inited = false,
+	    grid_inited = false
 		modulesNames.push('DataStorage', 'Workspaces')
 
     function initDataboard () {
       modules.Workspaces.init()
 	    modules.DataStorage.init(modules.Workspaces.grid)
 	    inited = true
+	    grid_inited = true
+	  }
+	  function deinitGrid () {
+	    modules.Workspaces.grid.deinit()
+	    modules.Workspaces.inited = false
+	    grid_inited = false
+	  }
+	  function initGrid () {
+	    modules.Workspaces.show(localStorage['currentWorkspace'])
+	    grid_inited = true
 	  }
 	</script>
 </head>

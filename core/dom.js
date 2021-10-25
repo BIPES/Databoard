@@ -53,11 +53,13 @@ class DOM {
   * @param {function} ev - Function to be executed on click.
   */
   onclick (self, ev, args){
-    this._dom.onclick = () => {
+    this._dom.onclick = (e) => {
 			if (typeof args == 'undefined')
-				ev.bind(self)()
-			else if (args.constructor == Array)
+				ev.apply(self, [e])
+			else if (args.constructor == Array) {
+			  args.push (e)
 				ev.apply(self, args)
+			}
 		};
 	return this;
   }
