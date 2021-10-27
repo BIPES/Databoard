@@ -5,31 +5,9 @@
 	<link rel="stylesheet" href='./core/main.css' />
 	<script type="module" src="./core/databoard.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 	<script type="text/javascript" src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
-	<script>
-		var modulesNames = [],
-	    modules = {},
-	    section,
-	    inited = false,
-	    grid_inited = false
-		modulesNames.push('DataStorage', 'Workspaces')
 
-    function initDataboard () {
-      modules.Workspaces.init()
-	    modules.DataStorage.init(modules.Workspaces.grid)
-	    inited = true
-	    grid_inited = true
-	  }
-	  function deinitGrid () {
-	    modules.Workspaces.grid.deinit()
-	    modules.Workspaces.inited = false
-	    grid_inited = false
-	  }
-	  function initGrid () {
-	    modules.Workspaces.show(localStorage['currentWorkspace'])
-	    grid_inited = true
-	  }
-	</script>
 </head>
 
 
@@ -37,6 +15,40 @@
 
 <section>
 </section>
+<script>
+  //Out of module to be accessible by BIPES
+  var modules = {}
+  function initDataboard () {
+    modules.Workspaces.init()
+    modules.DataStorage.init(modules.Workspaces.grid)
+    inited = true
+    grid_inited = true
+  }
+  function deinitGrid () {
+    modules.Workspaces.grid.deinit()
+    modules.Workspaces.inited = false
+    grid_inited = false
+  }
+  function initGrid () {
+    modules.Workspaces.show(localStorage['currentWorkspace'])
+    grid_inited = true
+  }
+</script>
+<script type="module">
+  import {Workspaces} from './core/databoard.js'
+  import {DataStorage} from './core/datastorage.js'
 
+  var modulesNames = ['DataStorage', 'Workspaces'],
+      grid_inited = false,
+      inited = false
 
+  modulesNames.forEach ((module) => {
+	  eval(`modules.${module} = new ${module}()`)
+  });
+
+  //Init if not in a iframe
+  if (window.self == window.top) {
+    initDataboard ()
+  }
+</script>
 </body>

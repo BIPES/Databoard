@@ -18,21 +18,23 @@ class DOM {
           if (['innerText', 'className', 'id', 'title', 'innerText'].includes(tag))
            this._dom [tag] = tags [tag]
         }
-        break;
+        break
 	  case 'video':
         this._dom = document.createElement (dom);
         if (typeof tags == 'object') for (const tag in tags) {
           if (['preload', 'controls', 'autoplay'].includes(tag))
            this._dom [tag] = tags [tag]
         }
-        break;
+        break
+    case 'select':
+    case 'option':
 	  case 'input':
         this._dom = document.createElement (dom);
         if (typeof tags == 'object') for (const tag in tags) {
-          if (['value', 'className', 'id'].includes(tag))
+          if (['value', 'className', 'id', 'innerText'].includes(tag))
            this._dom [tag] = tags [tag]
         }
-        break;
+        break
     }
   }
   /**
@@ -40,11 +42,13 @@ class DOM {
   * @param {function} ev - Function to be executed on click.
   */
   onchange (self, ev, args){
-    this._dom.onchange = () => {
+    this._dom.onchange = (e) => {
 			if (typeof args == 'undefined')
-				ev.bind(self)()
-			else if (args.constructor == Array)
+				ev.apply(self, [e])
+			else if (args.constructor == Array) {
+			  args.push(e)
 				ev.apply(self, args)
+			}
 		};
 	return this;
   }
@@ -57,7 +61,7 @@ class DOM {
 			if (typeof args == 'undefined')
 				ev.apply(self, [e])
 			else if (args.constructor == Array) {
-			  args.push (e)
+			  args.push(e)
 				ev.apply(self, args)
 			}
 		};

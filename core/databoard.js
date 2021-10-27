@@ -4,15 +4,9 @@
 import {Actions, Action, Charts} from './action.js'
 import {DOM} from './dom.js'
 import {DataStorage, StorageManager} from './datastorage.js'
+export {Workspaces}
 
 let section
-
-window.onload = () => {
-	section = get('section')
-	modulesNames.forEach ((module) => {
-		eval(`modules.${module} = new ${module}()`)
-	});
-}
 
 function get (a, b){
 	return (typeof b == 'undefined') ? document.querySelector (a) : b.querySelector(a)
@@ -46,7 +40,7 @@ class Grid {
 		$.add = new DOM('button', {
 			'className':'icon notext',
 			'id':'add',
-			'title':'Adicionar stream'
+			'title':'Add widget'
 			})
 			.onclick(this, this.add)
 		$.container = new DOM('span')
@@ -72,7 +66,7 @@ class Grid {
 		if (this.uid_streams.length >= 9)
 			return false
 		if (typeof localStorage['currentWorkspace'] == 'undefined')
-			modules.databoard.workspaces.add()
+			modules.Workspaces.add()
 
 		let uid = UID ()
 		this.uid_streams.push(uid)
@@ -111,8 +105,6 @@ class Grid {
 
 		    let index1 = this.charts.length
 		    this.charts.push (Charts.chart(uid, chart._dom))
-        this.charts [index1].uid = uid
-        this.charts [index1].dataset = data.setup.dataset.value
 
 	      chart.onclick(this, this.edit, [uid, chart._dom, this])
 		    break
@@ -303,7 +295,7 @@ class Workspaces{
 			$.storageManager
 			])
 
-		section.append ($.dashboard._dom)
+		get('section').append ($.dashboard._dom)
 
 		$.add = new DOM('div', {
 			'className':'button icon notext',

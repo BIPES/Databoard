@@ -62,27 +62,27 @@ class DataStorage {
     let mat = this._data[dataset].map(function(arr) {
       return arr.slice();
     });
+
+	  let limitPoints = parseInt(opt.setup.limitPoints.value)
+    if (!isNaN(limitPoints))
+      mat = mat.slice(-limitPoints)
+
     this.transpose (mat)
 
     let labels = opt.setup.labels.value.split(',').map((i)=>i.trim())
     labels = labels.length == 1 && labels[0] == '' ? [] : labels
 
     let datasets = [];
-    let backgroundColor = [];
-    let borderColor = [];
 
 
     for (let i = 1; i < mat.length; i++){
-      let bgc, bdc = i < 7 ? Charts.colors(i - 1) : this.randomColor()
-
-      backgroundColor.push(bgc)
-      borderColor.push(bdc)
+      let bd = i < 7 ? Charts.colors(i - 1) : this.randomColor()
 
       datasets.push ({
         label: i - 1 < labels.length  ? labels [i - 1]: `Data ${i}`,
         data: mat[i],
-        backgroundColor:bgc,
-        borderColor:bdc,
+        backgroundColor:bd[1],
+        borderColor:bd[0],
         borderWidth:1
       })
     }
@@ -111,7 +111,7 @@ class DataStorage {
     let b = 255 - a
     let c = 255 - a - b
 
-    return `rgba(${a},${b}.${c},0.8)`,`rgba(${a},${b}.${c},1.0)`
+    return [`rgba(${a},${b}.${c},0.8)`,`rgba(${a},${b}.${c},1.0)`]
 
   }
 
@@ -129,6 +129,12 @@ class DataStorage {
             chart.data.datasets.forEach((dataset, index) => {
               dataset.data.push(coordinates[index + 1])
             })
+            if (chart.hasOwnProperty('limitPoints') && chart.data.labels.length > chart.limitPoints) {
+              chart.data.labels.splice (0,1)
+              chart.data.datasets.forEach((dataset, index) => {
+                dataset.data.splice (0,1)
+              })
+            }
             chart.update()
           }
         }

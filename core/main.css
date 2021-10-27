@@ -347,8 +347,6 @@ section #dashboard.on #grid #add {
 }
 #grid #actions {
 	transition: .25s ease width, .25s ease right;
-}
-#grid #actions {
 	width: 0;
 	border-left: 1px solid #ccc;
 	box-sizing: border-box;
@@ -359,25 +357,30 @@ section #dashboard.on #grid #add {
 	z-index:11;
 	overflow:hidden;
 }
-#dashboard.on #actions{
+#dashboard.on #actions {
   right: 8rem;
+}
+#grid.on #actions {
+	border-right: 1px solid #ccc;
 }
 #grid #actions button.noicon{
 	margin: 0;
 	width: 100%;
-	padding: .5em 0;
 	background: transparent !important;
 }
 #grid #actions > span > div {
-	border: 1px solid #888;
+  font-size: 0.9em;
+  color: #666;
 	border-radius: .5em;
 	margin: .125em 0 .125em 0;
 	width: 100%;
-	text-align: center;
 	padding: .5em 0;
 }
 #grid #actions .button, #grid #actions .switch {
     transition: box-shadow ease .125s, .125s ease background-color, margin ease .125s;
+}
+#actions .switch {
+	border: 1px solid #888;
 }
 #actions .range button {
 	margin: 0.5em 0.25em 0 0.25em !important;
@@ -407,10 +410,15 @@ section #dashboard.on #grid #add {
 }
 #grid #actions input {
 	border: none;
-	border-bottom: 1px solid #000;
-    width: 100%;
-	text-align: center;
-
+	border-bottom: 1px solid #aaa;
+  width: 100%;
+  padding: 0.25em 0;
+}
+input:focus, input:hover{
+    outline:none;
+}
+input:focus {
+    border-color: #3298dc !important;
 }
 #grid #actions > span > div:active {
     margin: .125em 0 .125em 0 !important;
@@ -515,4 +523,19 @@ section #dashboard.on #grid #add {
 }
 #storageManager span > div > div {
   display: flex;
+}
+
+.dropdown select {
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid #666;
+  padding: .5em;
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: #000;
+  border-radius: .25em;
+  width: 100%;
+  margin: .5em 0;
 }
