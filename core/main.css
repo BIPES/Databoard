@@ -2,15 +2,11 @@ preview
 *{
     -webkit-tap-highlight-color: transparent;
 }
-@font-face {
-        font-family: "OpenSans";
-        src: url("/static/font/OpenSans.ttf");
-}
 body {
   border-top: 1px solid #ccc;
 }
 body, input {
-  font: 1em 'OpenSans', sans-serif;
+  font: 1em sans-serif;
   margin: 0;
   overflow: hidden;
   user-select: none;
@@ -19,7 +15,7 @@ body, input {
 form input, form textarea, form select, button {
 	color: #000;
 	background: none;
-	font: 1em 'OpenSans', sans-serif;
+	font: 1em sans-serif;
 	outline: none;
 	border: none;
 }
@@ -508,6 +504,7 @@ input:focus {
   max-height: 40em;
   padding: 0.5em 1em 1em 1em;
   margin: 0 auto;
+  overflow-y: auto;
 }
 #storageManager > div, #addMenu > div{
   background: #fff;

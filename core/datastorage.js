@@ -32,7 +32,6 @@ class DataStorage {
     this.chartPush (dataset, coordinates)
   }
   remove (uid) {
-    console.log(this)
 		this._keys.forEach((dataset, index) => {
 		  if (dataset == uid)
 			  this._keys.splice(index,1)
@@ -245,7 +244,7 @@ class StorageManager {
       })
     }
   }
-  download (uid) {
+  download (uid){
     let csv = modules.DataStorage.exportCSV(uid)
     let data = "data:text/csv;charset=utf-8," + encodeURIComponent(csv)
 	  let element = document.createElement('a')
@@ -255,6 +254,9 @@ class StorageManager {
 	  document.body.appendChild(element)
 	  element.click ()
 	  document.body.removeChild(element)
+  }
+  uploadCSV (){
+    alert('CSV import coming soon...')
   }
 }
 
