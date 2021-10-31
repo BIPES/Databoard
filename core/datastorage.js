@@ -1,7 +1,7 @@
 "use strict";
 
-import {Charts} from './action.js'
-import {DOM} from './dom.js'
+import {DOM, Animate} from './dom.js'
+import {Charts, Streams} from './plugins.js'
 export {DataStorage, StorageManager}
 
 class DataStorage {
@@ -145,7 +145,7 @@ class DataStorage {
 
 
 class StorageManager {
-  constructor (dom, dom_grid){
+  constructor (dom, grid_ref){
     this.datalake = []
 
     let $ = this._dom = {}
@@ -170,7 +170,7 @@ class StorageManager {
         $.container
       ])
     $.storageManager.append($.wrapper)
-    this.gridObj = dom_grid
+    this.gridObj = grid_ref
   }
   close (e) {
     if (e.target.id == 'storageManager')
@@ -258,18 +258,3 @@ class StorageManager {
   }
 }
 
-class Animate {
-  constructor (){}
-  static off (dom, callback){
-    dom.className = 'ani'
-    setTimeout(()=>{
-      dom.className = ''
-      if (callback != undefined)
-        callback ()
-      }, 250)
-  }
-  static on (dom){
-    dom.className = 'ani'
-    setTimeout(()=>{dom.className = 'ani on'}, 250)
-  }
-}

@@ -1,6 +1,6 @@
 "use strict";
 
-export {DOM}
+export {DOM, Animate}
 
 /** Make DOM Node element*/
 class DOM {
@@ -83,5 +83,22 @@ class DOM {
 	})
 
 	return this
+  }
+}
+
+
+class Animate {
+  constructor (){}
+  static off (dom, callback){
+    dom.className = 'ani'
+    setTimeout(()=>{
+      dom.className = ''
+      if (callback != undefined)
+        callback ()
+      }, 250)
+  }
+  static on (dom){
+    dom.className = 'ani'
+    setTimeout(()=>{dom.className = 'ani on'}, 250)
   }
 }

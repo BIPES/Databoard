@@ -1,7 +1,8 @@
 "use strict";
 
 import {DOM} from './dom.js'
-export {Actions, Action, Charts}
+import {Charts, Streams} from './plugins.js'
+export {Actions, Action}
 
 class Actions {
 	constructor (dom){
@@ -33,15 +34,19 @@ class Actions {
 	}
 	build (type){
 	  switch (type){
-	    case 'dash.js':
+	    case 'stream':
 	      return {
+	        source: {
+	          type: 'dropdown',
+	          value: 'DASH'
+	        },
 	        manifest: {
 	          type: 'input',
 	          value: 'https://livesim.dashif.org/livesim/chunkdur_1/ato_7/testpic4_8s/Manifest300.mpd'
 	        }
 	      }
 	      break
-	    case 'chart.js':
+	    case 'chart':
         return {
           source: {
             type: 'dropdown',
@@ -86,19 +91,20 @@ class Actions {
 
 	static dict (plugin, key){
 	  let _dict = {
-	    'chart.js': {
+	    'chart': {
 	      dataset: 'Topic',
 	      chartType: ['Chart type', ['line','scatter','bar','pie','radar']],
 	      title: 'Title',
-	      source: ["Database", ["localStorage", "easyMQTT"]],
+	      source: ["Database", ["localStorage"]],
 	      labels: 'Labels',
 	      timeseries: 'Is Unix timestamp',
 	      limitPoints: 'Limit to last datapoints',
 	      xLabel: 'x-axis label',
 	      yLabel: 'y-axis label'
 	    },
-	    'dash.js': {
-	      manifest: 'Stream source'
+	    'stream': {
+	      source: ["Standard",["MJPEG","DASH"]],
+	      manifest: 'Manifest address'
 	    }
 	  }
 	  return _dict[plugin][key]
@@ -165,7 +171,7 @@ class Action {
 			this._dom.action._dom.className = data.setup.timeseries.value ? 'switch on' : 'switch'
 
 			switch(this.plugin){
-			  case 'chart.js':
+			  case 'chart':
 			    switch (this.key){
 			      case 'timeseries':
           		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
@@ -178,7 +184,7 @@ class Action {
 			let str = String(this._dom.input._dom.value)
       let data = JSON.parse(localStorage[`stream:${this.uid}`])
 			switch(this.plugin){
-			  case 'chart.js':
+			  case 'chart':
 			    switch (this.key){
 			      case 'dataset':
 			      case 'title':
@@ -193,18 +199,14 @@ class Action {
 			        break
 			    break
 			  }
-			  case 'dash.js':
+			  case 'stream':
 			    switch (this.key){
 			      case 'manifest':
               data.setup.manifest.value = str,
           		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
 
-              for (const index in obj.players) {
-                if (obj.players[index].uid == this.uid) {
-			            obj.players[index].attachSource(str)
-			            obj.players[index].uid = this.uid
-			          }
-			        }
+          		Streams.manifest(obj, data.setup, this.uid)
+              break
 			    }
 			}
 	}
@@ -212,7 +214,7 @@ class Action {
 		let str = String(this._dom.dropdown._dom.value)
     let data = JSON.parse(localStorage[`stream:${this.uid}`])
 		switch(this.plugin){
-		  case 'chart.js':
+		  case 'chart':
 		    switch (this.key){
 		      case 'source':
             data.setup.source.value = str,
@@ -227,6 +229,14 @@ class Action {
         		Charts.regen(obj, data.setup.dataset.value, this.uid, this.dom)
 		        break
    		}
+   		case 'stream':
+   		  switch (this.key){
+   		    case 'source':
+            data.setup.source.value = str,
+        		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
+
+            Streams.regen(obj, data.setup, this.uid, this.dom)
+   		  }
     }
   }
 
@@ -250,66 +260,3 @@ class Action {
 }
 
 
-class Charts {
-  constructor (){}
-  static chart (uid, dom) {
-		let data = JSON.parse(localStorage[`stream:${uid}`])
-		let data2 = modules.DataStorage.chartData(data.setup.dataset.value, data);
-
-		let options = {
-		            plugins: {
-		                legend: {
-		                  position: 'top'
-		                }
-		              },
-                scales: {
-                  },
-                maintainAspectRatio: false,
-                animation: {
-                  duration: 0
-                },
-                resizeDelay: 125
-              }
-
-		if (data.setup.title.value != '')
-		  options.plugins.title = {display: true, text: data.setup.title.value, font: {size: 14}}
-
-    if (data.setup.timeseries.value)
-		  options.scales.xAxes = {type: 'time', distribution: 'linear'}
-
-		if (data.setup.xLabel.value != '')
-		  options.scales.x = {display: true, title:{display: true, text: data.setup.xLabel.value}}
-		if (data.setup.yLabel.value != '')
-		  options.scales.y = {beginAtZero: true, display: true, title:{display: true, text: data.setup.yLabel.value}}
-		else
-		  options.scales.y = {beginAtZero: true}
-
-    let _chart = new Chart(dom, {
-		        type: data.setup.chartType.value,
-		        data: data2,
-		        options: options
-		  })
-
-    _chart.uid = uid
-    _chart.dataset = data.setup.dataset.value
-    let limitPoints = parseInt(data.setup.limitPoints.value)
-    if (!isNaN(limitPoints))
-        _chart.limitPoints = limitPoints
-
-    return _chart
-  }
-  static colors (i) {
-    let bgc = ['rgba(106,168,251,0.5)', 'rgba(123,73,173,0.5)', 'rgba(106,251,116,0.5)', 'rgba(251,106,106,0.5', 'rgba(56,95,70,0.5)', 'rgba(318,95,70,0.5)']
-    let bdc = ['rgba(106,168,251,1.0)', 'rgba(123,73,173,1.0)', 'rgba(106,251,116,1.0)', 'rgba(251,106,106,1.0', 'rgba(56,95,70,1.0)', 'rgba(318,95,70,1.0)']
-
-    return [bdc[i], bgc[i]]
-  }
-  static regen (obj, datasetName, uid, dom) {
-    for (const index in obj.charts) {
-      if (obj.charts[index].uid == uid) {
-        obj.charts[index].destroy()
-        obj.charts[index] = Charts.chart(uid, dom)
-      }
-    }
-  }
-}

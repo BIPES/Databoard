@@ -162,6 +162,12 @@ button#download:before {
 #dashboard.scrollView .button#gridView:before {
   background-position: left calc(-1.5rem*27) bottom;
 }
+.icon#streamButton:before {
+  background-position: left calc(-1.5rem*28) top;
+}
+.icon#chartButton:before {
+  background-position: left calc(-1.5rem*29) top;
+}
 section {
 	position: absolute;
 	width: 100vw;
@@ -453,16 +459,28 @@ input:focus {
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr;
 }
-#grid span.s2 {
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows: 1fr;
+@media (orientation:landscape) {
+  #grid span.s2 {
+	  grid-template-columns: 1fr 1fr;
+	  grid-template-rows: 1fr;
+	}
+  #grid span.s5, #grid span.s6 {
+	  grid-template-columns: 1fr 1fr 1fr;
+	  grid-template-rows: 1fr 1fr;
+  }
+}
+@media (orientation:portrait) {
+  #grid span.s2 {
+	  grid-template-columns: 1fr;
+	  grid-template-rows: 1fr 1fr;
+	}
+  #grid span.s5, #grid span.s6 {
+	  grid-template-columns: 1fr 1fr;
+	  grid-template-rows: 1fr 1fr 1fr;
+  }
 }
 #grid span.s3, #grid span.s4 {
 	grid-template-columns: 1fr 1fr;
-	grid-template-rows: 1fr 1fr;
-}
-#grid span.s5, #grid span.s6 {
-	grid-template-columns: 1fr 1fr 1fr;
 	grid-template-rows: 1fr 1fr;
 }
 #grid span.s7, #grid span.s8, #grid span.s9 {
@@ -470,7 +488,7 @@ input:focus {
 	grid-template-rows: 1fr 1fr 1fr;
 }
 
-#storageManager {
+#storageManager, #addMenu {
   display: none;
   position: absolute;
   width: 100vw;
@@ -479,23 +497,25 @@ input:focus {
   z-index:12;
   transition: background-color ease .25s;
 }
-#storageManager.on, #storageManager.ani{
+#storageManager.on, #storageManager.ani, #addMenu.on, #addMenu.ani{
   display: block;
 }
-#storageManager.on {
-  background: rgba(0,0,0,.2);
+#storageManager.on, #addMenu.on{
+  background: rgba(0,0,0,.1);
 }
 #storageManager > div {
-  margin: 0 auto;
   max-width: 30em;
   max-height: 40em;
+  padding: 0.5em 1em 1em 1em;
+  margin: 0 auto;
+}
+#storageManager > div, #addMenu > div{
   background: #fff;
   box-shadow: 0 .25em .5em rgba(0,0,0,0.5);
   border-radius: 1em;
-  margin-top: 110vh;
+  margin-top: 100vh;
   opacity: 0;
   transition: margin-top ease .25s, opacity ease .25s;
-  padding: 0.5em 1em 1em 1em;
   box-sizing: border-box;
 }
 #storageManager.on > div {
@@ -523,6 +543,22 @@ input:focus {
 }
 #storageManager span > div > div {
   display: flex;
+}
+#addMenu.on > div {
+  margin-top: calc(100vh - 5.25em);
+  opacity: 1;
+}
+#addMenu > div {
+  max-width: 10em;
+  padding: 0.5em;
+  display: flex;
+  justify-content: space-around;
+  margin-right: 8.5em;
+  margin-left: auto;
+}
+#addMenu button {
+  padding: .5em;
+  border-radius: 0.5em;
 }
 
 .dropdown select {

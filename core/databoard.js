@@ -1,8 +1,9 @@
 
 "use strict";
 
-import {Actions, Action, Charts} from './action.js'
-import {DOM} from './dom.js'
+import {Actions, Action} from './action.js'
+import {Charts, Streams} from './plugins.js'
+import {DOM, Animate} from './dom.js'
 import {DataStorage, StorageManager} from './datastorage.js'
 export {Workspaces}
 
@@ -25,7 +26,6 @@ function switchState (dom, str){
   let _c = dom.className
   dom.className = _c.search(str) == -1 ? `${_c} ${str}`.trim() : _c.replace(str, '')
 }
-
 class Grid {
 	constructor (dom){
 		this.streams = []
@@ -37,18 +37,11 @@ class Grid {
 		let $ = this._dom = {}
 		$.grid = dom
 		$.actions = new DOM('div', {'id':'actions'})
-		$.add = new DOM('button', {
-			'className':'icon notext',
-			'id':'add',
-			'title':'Add widget'
-			})
-			.onclick(this, this.add)
+
 		$.container = new DOM('span')
-		$.grid.append([$.add, $.container, $.actions])
+		$.grid.append([$.container, $.actions])
 
 		this.actions = new Actions($.actions)
-
-
 	}
 	restore (wksp_uid){
 		if (localStorage[`workspace:${wksp_uid}`] != ''){
@@ -62,6 +55,7 @@ class Grid {
 			})
 		}
 	}
+
 	add (type){
 		if (this.uid_streams.length >= 9)
 			return false
@@ -71,10 +65,6 @@ class Grid {
 		let uid = UID ()
 		this.uid_streams.push(uid)
 
-		/*REVIEW*/
-		type = prompt("Qual tipe", "chart.js");
-		/*ENDREVIEW*/
-
 		localStorage.setItem (`stream:${uid}`,JSON.stringify({'type':type, 'setup': this.actions.build(type)}))
 
 		this.include(uid)
@@ -82,7 +72,7 @@ class Grid {
 	include (uid){
 	  let data = JSON.parse (localStorage[`stream:${uid}`]);
 	  switch (data.type) {
-	    case 'chart.js':
+	    case 'chart':
 	      console.log('Including chart.js')
 
 	      let chart = new DOM('canvas', {className:'chart'})
@@ -108,7 +98,7 @@ class Grid {
 
 	      chart.onclick(this, this.edit, [uid, chart._dom, this])
 		    break
-	    case 'dash.js':
+	    case 'stream':
 
 		    localStorage.setItem (`stream:${uid}`,JSON.stringify(data))
 
@@ -133,39 +123,13 @@ class Grid {
 		    $2.container._dom.className = `s${this.streams.length}`
 
 		    let index2 = this.players.length;
-		    this.players.push (dashjs.MediaPlayer().create())
-		    this.players [index2].uid = uid
-		    this.players [index2].updateSettings({ 'streaming': { 'lowLatencyEnabled': true } })
+		    this.players.push (Streams.stream(uid, video._dom))
 
-		    this.players [index2].initialize(video._dom, data.setup.manifest.value, true)
-		    this.applyParameters(this.players [index2])
-		    video.onclick(this, this.edit, [uid, video._dom, this]);
-
+        video.onclick(this, this.edit, [uid, video._dom, this]);
 		    break
 		  }
 		  localStorage.setItem(`workspace:${localStorage['currentWorkspace']}`, JSON.stringify(this.uid_streams))
 	}
-	/*REVIEW*/
-	applyParameters (player){
-        let targetLatency = parseFloat(10, 10);
-        let minDrift = parseFloat(0.05, 10);
-        let catchupPlaybackRate = parseFloat(0.05, 10);
-        let liveCatchupLatencyThreshold = parseFloat(60, 10);
-
-		player.updateSettings({
-            streaming: {
-                delay: {
-                    liveDelay: targetLatency
-                },
-                liveCatchup: {
-                    minDrift: minDrift,
-                    playbackRate: catchupPlaybackRate,
-                    latencyThreshold: liveCatchupLatencyThreshold,
-                }
-            }
-        });
-	}
-	/*ENDREVIEW*/
 	remove (uid){
 		console.log(`Removing stream ${uid}`)
 
@@ -174,7 +138,8 @@ class Grid {
 		  case 'dash.js':
 		    this.players.forEach((player, index) => {
 			    if (player.uid == uid) {
-				    player.destroy()
+				      if (player.source = 'DASH')
+				        player.destroy()
 			      this.players.splice(index,1)
 			    }
 		    })
@@ -192,7 +157,7 @@ class Grid {
 		if (this.editingStream == uid) {
 			this._dom.grid._dom.className = ''
 			this.editingStream = '';
-			setTimeout(this.actions.deinit,250)
+			setTimeout(() => {this.actions.deinit}, 250)
 		}
 
 		this.streams.forEach((item, index) => {
@@ -254,16 +219,13 @@ class Grid {
 
 		localStorage.setItem(`workspace:${wksp}`, JSON.stringify(this.uid_streams))
 
-    this.players.forEach((player, index) => {
-		  player.destroy()
+    this.players.forEach((player) => {
+      if (player.source == 'DASH')
+		    player.destroy()
     })
-    this.charts.forEach((chart, index) => {
+    this.charts.forEach((chart) => {
       chart.destroy()
     })
-
-		this.players.forEach((player) => {
-			player.destroy()
-		});
 		this.streams.forEach((item) => {
 			item._dom.remove()
 		});
@@ -288,12 +250,14 @@ class Workspaces{
 		$.grid = new DOM('div', {'id':'grid'})
 		$.workspaces = new DOM('div', {'id':'workspaces'})
 		$.storageManager = new DOM('div', {'id':'storageManager'})
+		$.addMenu = new DOM('div', {'id':'addMenu'})
 
 		$.dashboard.append ([
-			$.grid,
-			$.workspaces,
-			$.storageManager
-			])
+		  $.grid,
+		  $.workspaces,
+		  $.storageManager,
+		  $.addMenu
+		])
 
 		get('section').append ($.dashboard._dom)
 
@@ -320,6 +284,12 @@ class Workspaces{
 			'title':'Switch view type'
 		  })
 		  .onclick(this, this.gridView)
+		$.addPlugin = new DOM('button', {
+			'className':'icon notext',
+			'id':'add',
+			'title':'Add widget'
+			})
+
 
 		$.container = new DOM('span')
 		$.wrapper = new DOM('div').append([$.container, $.add])
@@ -327,8 +297,13 @@ class Workspaces{
 		$.workspaces.append([$.wrapper, $.wrapper2])
 
 		this.grid = new Grid($.grid)
+		$.grid.append($.addPlugin)
+
 		this.storageManager = new StorageManager($.storageManager, this.grid)
 		$.storage.onclick (this.storageManager, this.storageManager.open);
+
+		this.addMenu = new AddMenu($.addMenu, this.grid)
+		$.addPlugin.onclick (this.addMenu, this.addMenu.open)
 	}
 	init (){
     this.restore()
@@ -427,4 +402,42 @@ class Workspaces{
 		})
 	}
 }
+class AddMenu {
+  constructor (dom, grid_ref){
+    this.plugins = {
+      chart:'Chart',
+      stream:'Stream'
+    }
 
+
+    let $ = this._dom = {}
+    $.addMenu = dom
+    $.addMenu.onclick(this, this.close)
+    $.plugins = []
+
+    for (const plugin in this.plugins) {
+      $.plugins.push(new DOM('button', {
+          value: plugin,
+          id:`${plugin}Button`,
+          className:'icon',
+          innerText: this.plugins[plugin]
+        })
+        .onclick(grid_ref, grid_ref.add, [plugin]))
+    }
+
+    $.wrapper = new DOM('div')
+      .append($.plugins)
+    $.addMenu.append($.wrapper)
+    this.gridObj = grid_ref
+  }
+  close (e) {
+    if (e.target.id == 'addMenu')
+      Animate.off(this._dom.addMenu._dom)
+  }
+  open (){
+    this.restore ()
+    Animate.on(this._dom.addMenu._dom)
+  }
+  restore() {
+  }
+}
