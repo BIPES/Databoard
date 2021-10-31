@@ -116,7 +116,7 @@ nav a:before, nav span:before, button.icon:before, .button.icon:before {
 	display: block;
 	width: 1.5rem;
 	height: 1.5rem;
-	background: url('../../ui/media/icons.svg');
+	background: url('/beta2/ui/media/icons.svg');
 	content: '';
 	margin: 0 auto;
 }
