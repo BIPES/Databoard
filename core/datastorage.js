@@ -12,9 +12,6 @@ class DataStorage {
     this.gridObj
   }
   init (gridObj) {
-    //this._data = dataStorage
-    //this._keys = Object.keys(dataStorage)
-
     this.gridObj = gridObj
   }
   push (dataset, coordinates) {
@@ -37,12 +34,6 @@ class DataStorage {
 			  this._keys.splice(index,1)
 		})
 		delete this._data[uid]
-  }
-  exportCSV (uid) {
-    return JSON.stringify(this._data[uid])
-      .replaceAll('],[','\r\n')
-      .replace(']]','')
-      .replace('[[',`"BIPES","Databoard"\r\n"Data:","${uid}"\r\n"Timestamp:","${String(+new Date())}"\r\n`)
   }
   chartData (dataset, opt) {
     if (!this._keys.includes(dataset)) {
@@ -150,17 +141,24 @@ class StorageManager {
     let $ = this._dom = {}
     $.storageManager = dom
     $.storageManager.onclick (this, this.close)
-    $.upload = new DOM('button', {
-			'className':'icon notext',
-			'id':'upload',
-			'title':'Upload CSV'
-			})
-			.onclick(this, this.uploadCSV)
+		$.upload = new DOM('input', {
+		    id:'uploadCSV',
+		    type:'file',
+		    accept:'.csv'
+		  })
+			.onchange(this, this.uploadCSV)
+    $.uploadLabel = new DOM('label', {
+			  className:'button icon notext',
+			  id:'upload',
+			  title:'Upload CSV',
+			  htmlFor:'uploadCSV'
+		  })
     $.h2 = new DOM ('h2',   {innerText: 'localStorage'})
     $.title = new DOM ('div', {className: 'header'})
       .append([
         $.h2,
-        $.upload
+        $.upload,
+        $.uploadLabel
       ])
     $.container = new DOM ('span')
     $.wrapper = new DOM('div')
@@ -169,6 +167,7 @@ class StorageManager {
         $.container
       ])
     $.storageManager.append($.wrapper)
+
     this.gridObj = grid_ref
   }
   close (e) {
@@ -244,8 +243,14 @@ class StorageManager {
       })
     }
   }
+  exportCSV (uid) {
+    return localStorage[`datastorage:${uid}`]
+      .replaceAll('],[','\r\n')
+      .replace(']]','')
+      .replace('[[',`"BIPES","Databoard"\r\n"Data:","${uid}"\r\n"Timestamp:","${String(+new Date())}"\r\n`)
+  }
   download (uid){
-    let csv = modules.DataStorage.exportCSV(uid)
+    let csv = this.exportCSV(uid)
     let data = "data:text/csv;charset=utf-8," + encodeURIComponent(csv)
 	  let element = document.createElement('a')
 	  element.setAttribute('href', data)
@@ -256,7 +261,59 @@ class StorageManager {
 	  document.body.removeChild(element)
   }
   uploadCSV (){
-    alert('CSV import coming soon...')
+    let _upload = this._dom.upload._dom
+    if  (_upload.files [0] != undefined) {
+      let file = _upload.files [0]
+      console.log(file.type)
+      if (/.csv$/.test(file.name) && file.type == 'text/csv'){
+        let reader = new FileReader ()
+        reader.readAsText(file,'UTF-8')
+        let self = this;
+        reader.onload = readerEvent => {
+          let csv = readerEvent.target.result
+          let lines = csv.split(/\r\n|\n/)
+          let dataname;
+          if (/^"BIPES","Databoard"/.test(lines[0])) {
+            if (/^"Data:","(.*)"/.test(lines[1])) {
+              dataname = lines[1].match(/"Data:","(.*)"/m)[1]
+            }
+            lines.splice(0,3)
+          } else {
+            dataname = file.name.replace('.csv', '')
+          }
+
+          lines.forEach ((coord, index) => {
+            lines[index] = lines[index].split(',')
+
+            lines[index].forEach ((point, index2) => {
+              if (!lines[index][index2].includes('"'))
+                lines[index][index2] = parseFloat(lines[index][index2])
+              else
+                lines[index][index2] = lines[index][index2].replaceAll('"', '')
+            })
+          })
+
+          if (!localStorage.hasOwnProperty(`datastorage:${dataname}`))
+            localStorage.setItem(`datastorage:${dataname}`, JSON.stringify(lines))
+          else {
+            let success = false,
+                index = 1
+            while(!success) {
+              if (!localStorage.hasOwnProperty(`datastorage:${dataname}_${index}`)) {
+                localStorage.setItem(`datastorage:${dataname}_${index}`, JSON.stringify(lines))
+                success = true
+              } else
+                index++
+            }
+          }
+          this.deinit()
+          this.restore()
+          console.log(dataname, lines, typeof lines[0][0], typeof lines[0][1])
+
+          _upload.value = ''
+        }
+      }
+    }
   }
 }
 

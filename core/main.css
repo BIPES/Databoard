@@ -146,7 +146,7 @@ button#remove:before {
 button#lower:before {
 	background-position: left calc(-1.5rem*24) top;
 }
-button#upload:before {
+.button#upload:before {
 	background-position: left calc(-1.5rem*2) top;
 }
 button#download:before {

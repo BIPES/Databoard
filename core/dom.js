@@ -29,9 +29,10 @@ class DOM {
     case 'select':
     case 'option':
 	  case 'input':
+	  case 'label':
         this._dom = document.createElement (dom);
         if (typeof tags == 'object') for (const tag in tags) {
-          if (['value', 'className', 'id', 'innerText'].includes(tag))
+          if (['value', 'className', 'id', 'innerText', 'htmlFor', 'accept', 'type'].includes(tag))
            this._dom [tag] = tags [tag]
         }
         break
