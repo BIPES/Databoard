@@ -18,7 +18,7 @@
 <script>
   //Out of module to be accessible by BIPES
   var modules = {}
-  function initDataboard () {
+  function initDataStorage () {
     modules.Workspaces.init()
     modules.DataStorage.init(modules.Workspaces.grid)
     inited = true
@@ -30,7 +30,7 @@
     grid_inited = false
   }
   function initGrid () {
-    modules.Workspaces.show(localStorage['currentWorkspace'])
+    modules.Workspaces.show(JSON.parse(localStorage['currentWorkspace']))
     grid_inited = true
   }
 </script>

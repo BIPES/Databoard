@@ -46,7 +46,6 @@ class Grid {
 	restore (wksp_uid){
 		if (localStorage[`workspace:${wksp_uid}`] != ''){
 			this.uid_streams = JSON.parse (localStorage[`workspace:${wksp_uid}`])
-
 			this.uid_streams.forEach ((uid) => {
 				if (typeof localStorage [`stream:${uid}`] != 'undefined')
 					this.include (uid)
@@ -128,7 +127,7 @@ class Grid {
         video.onclick(this, this.edit, [uid, video._dom, this]);
 		    break
 		  }
-		  localStorage.setItem(`workspace:${localStorage['currentWorkspace']}`, JSON.stringify(this.uid_streams))
+		  localStorage.setItem(`workspace:${JSON.parse(localStorage['currentWorkspace'])}`, JSON.stringify(this.uid_streams))
 	}
 	remove (uid){
 		console.log(`Removing stream ${uid}`)
@@ -172,7 +171,7 @@ class Grid {
 			}
 		})
 		localStorage.removeItem(`stream:${uid}`)
-		localStorage.setItem(`workspace:${localStorage['currentWorkspace']}`, JSON.stringify(this.uid_streams))
+		localStorage.setItem(`workspace:${JSON.parse(localStorage['currentWorkspace'])}`, JSON.stringify(this.uid_streams))
 
 		let $ = this._dom
 		$.container._dom.className = `s${this.streams.length}`
@@ -210,7 +209,7 @@ class Grid {
 		}
 	}
 	deinit (){
-		let wksp = localStorage['currentWorkspace']
+		let wksp = JSON.parse(localStorage['currentWorkspace'])
 		console.log(`Deiniting all streams`)
 
 		this._dom.grid._dom.className = ''
@@ -242,7 +241,7 @@ class Grid {
 class Workspaces{
 	constructor () {
 		this.workspaces = []
-		this.inited=false
+		this.inited = false
 
 
 		let $ = this._dom = {}
@@ -306,12 +305,25 @@ class Workspaces{
 		$.addPlugin.onclick (this.addMenu, this.addMenu.open)
 	}
 	init (){
-    this.restore()
+	  if(this.inited == false) {
+      this.restore()
 
-		if (typeof localStorage['currentWorkspace'] != 'undefined')
-			this.show(localStorage['currentWorkspace'])
-		else
-			this.add()
+		  if (typeof localStorage['currentWorkspace'] != 'undefined')
+			  this.show(JSON.parse(localStorage['currentWorkspace']))
+		  else
+			  this.add()
+		}
+	}
+	deinit (){
+	  if(this.inited == true) {
+	    this.grid.deinit()
+      console.log('Deiniting all workspaces')
+		  this.workspaces.forEach((item) => {
+			  item._dom.remove()
+		  });
+		  this.workspaces = []
+		  this.inited = false
+		}
 	}
 	restore (){
 		let keys = Object.keys (localStorage)
@@ -330,7 +342,7 @@ class Workspaces{
 	}
 	add (){
 		let uid = UID ()
-		localStorage.setItem (`workspace:${uid}`,'')
+		localStorage.setItem(`workspace:${uid}`,'[]')
 		this.include(uid)
 		this.show(uid)
 	}
@@ -340,7 +352,7 @@ class Workspaces{
 		let remove = new DOM('button', {
 			'className':'icon notext',
 			'id':'remove',
-			'title':'Remover tela'
+			'title':'Remove databoard'
 			});
 		remove.onclick(this, this.remove, [uid]);
 		let workspace = new DOM('div', {'id':uid})
@@ -356,7 +368,7 @@ class Workspaces{
 	remove (uid){
 		this.grid.purge(uid)
 
-		if (localStorage['currentWorkspace'] == uid) {
+		if (JSON.parse(localStorage['currentWorkspace']) == uid) {
 			this.grid.deinit();
 			let keys = Object.keys (localStorage)
 					.filter((key) => {
@@ -386,7 +398,6 @@ class Workspaces{
 	show (uid){
 		console.log(`Opening workspace ${uid}`)
 		if (this.inited) {
-			console.log('deinit')
 			let old_uid = this.grid.deinit()
 			this.workspaces.forEach((item) => {
 				if(item._dom.id == old_uid)
@@ -394,12 +405,47 @@ class Workspaces{
 				})
 		} else
 			this.inited = true;
-		localStorage.setItem('currentWorkspace', uid)
+		localStorage.setItem('currentWorkspace', JSON.stringify(uid))
 		this.grid.restore(uid)
 		this.workspaces.forEach((item) => {
 			if(item._dom.id == uid)
 				item._dom.className = 'on'
 		})
+	}
+	compress (){
+	  if (!localStorage.hasOwnProperty('currentWorkspace'))
+	    return `{"currentWorkspace":"kvfgejtdtlhg0wfqod9","workspace:kvfgejtdtlhg0wfqod9":[]}`
+
+	  let databoard = `{"currentWorkspace":${localStorage['currentWorkspace']}`
+
+		let keys = Object.keys (localStorage)
+				.filter((key) => {
+					return /(?:workspace|stream):(.*)/.test(key)
+				});
+		if (keys.length >= 1) {
+			keys.forEach((key) => {
+			  databoard += `,"${key}":${localStorage[key]}`
+			})
+		}
+		databoard += '}'
+	  return databoard
+	}
+	uncompress (obj){
+    for (const key in obj) {
+      localStorage.setItem(key, JSON.stringify(obj[key]))
+    }
+	}
+	clearLocalStorage (){
+	  localStorage.removeItem('currentWorkspace')
+		let keys = Object.keys (localStorage)
+				.filter((key) => {
+					return /(?:workspace|stream):(.*)/.test(key)
+				});
+		if (keys.length >= 1) {
+			keys.forEach((key) => {
+			  localStorage.removeItem(key)
+			})
+		}
 	}
 }
 class AddMenu {
