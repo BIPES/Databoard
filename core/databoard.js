@@ -23,25 +23,46 @@ function UID () {
 function switchState (dom, str){
   str = str == undefined ? 'on' : str
 
-  let _c = dom.className
-  dom.className = _c.search(str) == -1 ? `${_c} ${str}`.trim() : _c.replace(str, '')
+  if (dom.classList.contains(str))
+    dom.classList.remove(str)
+  else
+    dom.classList.add(str)
 }
 class Grid {
 	constructor (dom){
-		this.streams = []
 		this.players = []
 		this.charts = []
 		this.uid_streams = []
 		this.editingStream = '';
+		this.isDragging = false;
 
 		let $ = this._dom = {}
 		$.grid = dom
 		$.actions = new DOM('div', {'id':'actions'})
 
-		$.container = new DOM('span')
+		$.container = new DOM('div')
 		$.grid.append([$.container, $.actions])
 
 		this.actions = new Actions($.actions)
+
+		this.muuri = new Muuri($.container._dom, {
+		  dragEnabled: true,
+		  dragStartPredicate: (item, e) => {
+		    if (this._dom.grid._dom.classList.contains('edit') && e.deltaTime > 100){
+		      this.isDragging = true
+		      return true
+		    }
+		  } ,
+		  /*layout: {
+		    alignRight: true
+		  }*/
+		})
+		this.muuri.on('dragInit', (item, e) => {
+		  item._element.classList.add('dragging')
+    });
+		this.muuri.on('dragReleaseEnd', (item, e) => {
+		  item._element.classList.remove('dragging')
+    });
 	}
 	restore (wksp_uid){
 		if (localStorage[`workspace:${wksp_uid}`] != ''){
@@ -81,16 +102,17 @@ class Grid {
 			    'title':'Remove chart'
 			    })
 		      .onclick(this, this.remove, [uid]);
-		    let container = new DOM('div', {'id':uid})
+		    let content1 = new DOM('div')
 			    .append([
 				    remove1,
 				    chart
 			    ])
-		    this.streams.push(container)
+			  let container1 = new DOM('div', {'id':uid})
+			    .append(content1)
 
 		    let $1 = this._dom
-		    $1.container.append (container)
-		    $1.container._dom.className = `s${this.streams.length}`
+
+		    this.muuri.add(container1._dom)
 
 		    let index1 = this.charts.length
 		    this.charts.push (Charts.chart(uid, chart._dom))
@@ -109,17 +131,18 @@ class Grid {
 			    'title':'Remove stream'
 			    })
 		      .onclick(this, this.remove, [uid]);
-		    let stream = new DOM('div', {'id':uid})
+		    let content2 = new DOM('div')
 			    .append([
 				    remove2,
 				    video
 			    ])
-		    this.streams.push(stream)
+			  let container2 = new DOM('div', {'id':uid})
+			    .append(content2)
 
 
 		    let $2 = this._dom
-		    $2.container.append (stream)
-		    $2.container._dom.className = `s${this.streams.length}`
+
+		    this.muuri.add(container2._dom)
 
 		    let index2 = this.players.length;
 		    this.players.push (Streams.stream(uid, video._dom))
@@ -154,15 +177,14 @@ class Grid {
 		}
 
 		if (this.editingStream == uid) {
-			this._dom.grid._dom.className = ''
+			this._dom.grid._dom.classList.remove('on')
 			this.editingStream = '';
 			setTimeout(() => {this.actions.deinit}, 250)
 		}
 
-		this.streams.forEach((item, index) => {
-			if (item._dom.id == uid) {
-				item._dom.remove()
-				this.streams.splice(index,1)
+		this.muuri.getItems().forEach((item, index) => {
+			if (item._element.id == uid) {
+				this.muuri.remove([item], {removeElements: true})
 			}
 		})
 		this.uid_streams.forEach((item, index) => {
@@ -173,8 +195,6 @@ class Grid {
 		localStorage.removeItem(`stream:${uid}`)
 		localStorage.setItem(`workspace:${JSON.parse(localStorage['currentWorkspace'])}`, JSON.stringify(this.uid_streams))
 
-		let $ = this._dom
-		$.container._dom.className = `s${this.streams.length}`
 	}
 	purge (wksp_uid) {
 		if (localStorage[`workspace:${wksp_uid}`] != ''){
@@ -185,34 +205,39 @@ class Grid {
 			})
 		}
 	}
-	edit (uid, target, obj){
-		console.log(`Editing stream ${uid}`)
-		this.streams.forEach((item) => {
-			if(item._dom.className =='on')
-				item._dom.className = ''
-		})
-		if (uid == this.editingStream) {
-			this._dom.grid._dom.className = 'off'
-			this.editingStream = ''
-			this.streams.forEach((item) => {
-				if(item._dom.id == uid)
-					item._dom.className = ''
-			})
-		} else {
-			this._dom.grid._dom.className = 'on'
-			this.streams.forEach((item) => {
-				if(item._dom.id == uid)
-					item._dom.className = 'on'
-			})
-			this.actions.show(uid, target, obj)
-			this.editingStream = uid
+	edit (uid, target, obj, ev){
+	  if (this._dom.grid._dom.classList.contains('edit') && !this.isDragging) {
+		  console.log(`Editing stream ${uid}`)
+
+		  this.muuri.getItems().forEach((item) => {
+			  if(item._element.className =='on')
+				  item._element.className = ''
+		  })
+		  if (uid == this.editingStream) {
+			  this._dom.grid._dom.classList.remove('on')
+			  this.editingStream = ''
+			  this.muuri.getItems().forEach((item) => {
+				  if(item._element.id == uid)
+					  item._element.className = ''
+			  })
+		  } else {
+			  this._dom.grid._dom.classList.add('on')
+			  this.muuri.getItems().forEach((item) => {
+				  if(item._element.id == uid)
+					  item._element.className = 'on'
+			  })
+			  this.actions.show(uid, target, obj)
+			  this.editingStream = uid
+		  }
+		  setTimeout(() => {this.muuri.refreshItems().layout()}, 250)
 		}
+		this.isDragging = false
 	}
 	deinit (){
 		let wksp = JSON.parse(localStorage['currentWorkspace'])
 		console.log(`Deiniting all streams`)
 
-		this._dom.grid._dom.className = ''
+		this._dom.grid._dom.classList.remove('on')
 		this.editingStream = '';
 		setTimeout(() => {this.actions.deinit()},250)
 
@@ -225,12 +250,9 @@ class Grid {
     this.charts.forEach((chart) => {
       chart.destroy()
     })
-		this.streams.forEach((item) => {
-			item._dom.remove()
-		});
+    this.muuri.remove(this.muuri.getItems(), {removeElements: true})
 		this.players = []
 		this.charts = []
-		this.streams = []
 		this.uid_streams = []
 
 		return wksp
@@ -336,9 +358,12 @@ class Workspaces{
 	}
 	edit (){
 	  switchState(this._dom.dashboard._dom)
+	  switchState(this._dom.grid._dom, 'edit')
+		setTimeout(() => {this.grid.muuri.refreshItems().layout()}, 250)
 	}
 	gridView (){
 	  switchState(this._dom.dashboard._dom, 'scrollView')
+		this.grid.muuri.refreshItems().layout()
 	}
 	add (){
 		let uid = UID ()
@@ -401,7 +426,7 @@ class Workspaces{
 			let old_uid = this.grid.deinit()
 			this.workspaces.forEach((item) => {
 				if(item._dom.id == old_uid)
-					item._dom.className = ''
+					item._dom.classList.remove('on')
 				})
 		} else
 			this.inited = true;
@@ -409,7 +434,7 @@ class Workspaces{
 		this.grid.restore(uid)
 		this.workspaces.forEach((item) => {
 			if(item._dom.id == uid)
-				item._dom.className = 'on'
+				item._dom.classList.add('on')
 		})
 	}
 	compress (){

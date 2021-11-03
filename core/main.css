@@ -215,7 +215,8 @@ section #dashboard #workspaces{
 	grid-row: 1;
 	width: calc(100% - 4em);
 	transition: .25s ease width;
-	background: #ddd;
+	overflow-y: scroll;
+	overflow-x: hidden;
 }
 #workspaces {
 	grid-column: 2;
@@ -252,102 +253,61 @@ section #dashboard #workspaces{
   height: 100%;
 	cursor: pointer;
 }
+#dashboard.on #workspaces {
+	width: 6.5rem;
+}
 #grid button#remove, #dashboard #add {
 	display: none
 }
-#dashboard.on #workspaces {
-	width: 8rem;
-}
-#dashboard.on button#remove {
-	display: block
-}
-#dashboard.on #add {
+#dashboard.on #add{
   display:flex
 }
+/*
 
-#dashboard.scrollView #grid > span {
-  background-color: #fff;
-}
-#dashboard.scrollView #grid > span {
-  display: block;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-#dashboard.scrollView #grid > span > div {
-  max-width: 75em;
-  max-height: 75vh;
-  margin: 1em auto;
-  border-radius: 1em;
-  border: 1px solid #ddd;
-  width: 90%;
-  height: 75vw;
-}
 #dashboard.scrollView #grid.on > span > div {
-  /*width: calc(90vw - 11em) !important;*/
+  width: calc(90vw - 11em) !important;
 }
 #dashboard.scrollView #grid #remove {
   position: relative;
   margin: 0 0 -2.75em 0;
-}
+}*/
 #grid #add {
 	z-index: 12;
 	display: block !important;
-    position: absolute;
-    right: 8.5rem;
-    bottom: -5em;
-    border: 1px solid #000;
-    padding: .75em;
+  position: absolute;
+  right: 8.5rem;
+  bottom: -5em;
+  border: 1px solid #000;
+  padding: .75em;
 	margin-bottom: 0;
 	transition: .25s ease box-shadow, .25s ease margin-bottom, .25s ease bottom;
 }
-#grid #remove {
-    position: absolute;
-    border: 1px solid #000;
-    padding: .5em;
-	margin: .5em;
-	transition: .25s ease box-shadow;
-}
-#grid #remove:hover {
-	box-shadow: 0 0 .25em rgba(0, 0, 0, 0.5);
-}
-#grid {
-	overflow: hidden;
-	display: flex
-}
+
 section #dashboard.on #grid #add {
     bottom: .5em;
 }
 #grid #add:hover {
 	margin-bottom: .25em;
-    box-shadow: 0 .125em .25em rgba(0, 0, 0, 0.5);
+  box-shadow: 0 .125em .25em rgba(0, 0, 0, 0.5);
 }
-#grid > span {
-	display: grid;
-	grid-gap: 1px;
-	height: 100%;
+#grid > div {
+	position: relative;
+	height: calc(100vh - 3.5em);
 	width: 100%;
-}
+}/*
 #grid.on {
   width: calc(100% - 16em);
-}
+}*/
 #dashboard.on #grid.on{
-  width: calc(100% - 20em);
+  width: calc(100% - 18.5em);
 }
-#grid > span > div {
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
-	background: #fff;
-}
-#grid span video {
-	width: 100%;
-    height: 100%;
-}
+
 #grid button {
 	background: #fff;
 	z-index: 1;
 }
 #grid #actions {
+  top: 0;
 	transition: .25s ease width, .25s ease right;
 	width: 0;
 	border-left: 1px solid #ccc;
@@ -360,7 +320,7 @@ section #dashboard.on #grid #add {
 	overflow:hidden;
 }
 #dashboard.on #actions {
-  right: 8rem;
+  right: 6.5rem;
 }
 #grid.on #actions {
 	border-right: 1px solid #ccc;
@@ -439,18 +399,11 @@ input:focus {
     overflow-y: auto;
 	scrollbar-width: none;
 }
-#grid.on #actions {
+#dashboard.on #grid.on #actions {
 	width: 12em;
 }
-#grid > span > div {
-    transition: box-shadow ease .125s;
-}
-#grid > span > div.on {
-	box-shadow:  0 0 1em rgba(68, 153, 204, 1);
-	border-color: #3298dc;
-	z-index: 10
-}
 
+/*
 #grid span.s1 {
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr;
@@ -483,7 +436,7 @@ input:focus {
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-template-rows: 1fr 1fr 1fr;
 }
-
+*/
 #storageManager, #addMenu {
   display: none;
   position: absolute;
@@ -571,4 +524,62 @@ input:focus {
   border-radius: .25em;
   width: 100%;
   margin: .5em 0;
+}
+
+.muuri > div {
+  width: 33rem;
+  height: 22rem;
+  position: absolute;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+.muuri > div > div {
+  border-radius: 1em;
+  border: 1px solid #ddd;
+  background: #fff;
+  width: 100%;
+  height: 100%;
+}
+.muuri div video {
+	width: 100%;
+  height: 100%;
+}
+.muuri > div > div {
+  transition: box-shadow ease .125s;
+}
+#dashboard.on .muuri > div.on > div {
+	box-shadow:  0 0 1em rgba(68, 153, 204, 1);
+	border-color: #3298dc;
+	z-index: 10
+}
+.muuri #remove {
+  position: absolute;
+  border: 1px solid #000;
+  padding: .25em;
+	margin: -.75em;
+	transition: .25s ease box-shadow, .25s ease background-color;
+	background: #fff;
+}
+.muuri #remove:hover:before {
+  filter: invert(1)
+}
+.muuri #remove:hover {
+	background: #000 !important;
+	box-shadow: 0 0 .25em rgba(0, 0, 0, 0.5);
+}
+#dashboard.on #grid {
+  width: calc(100% - 6.5rem);
+}
+#dashboard.on button#remove {
+	display: block
+}
+#dashboard.scrollView .muuri > div {
+  width: 100%;
+  height: 100vh;
+}
+.dragging > div {
+	box-shadow:  0 0.5em 0.75em rgba(0, 0, 0, 0.25);
+}
+.dragging {
+  z-index: 999;
 }
