@@ -15,7 +15,7 @@ class DOM {
       case 'div':
         this._dom = document.createElement (dom);
         if (typeof tags == 'object') for (const tag in tags) {
-          if (['innerText', 'className', 'id', 'title', 'innerText'].includes(tag))
+          if (['innerText', 'className', 'id', 'title', 'innerText', 'tabIndex'].includes(tag))
            this._dom [tag] = tags [tag]
         }
         break
@@ -73,17 +73,24 @@ class DOM {
   * @param {Object[]} DOMS - Array of :js:func:`DOM` or/and direct DOM Nodes.
   */
   append (DOMS){
-	if (DOMS.constructor != Array)
-		DOMS = [DOMS]
+	  if (DOMS.constructor != Array)
+		  DOMS = [DOMS]
 
-	DOMS.forEach ((item) => {
-	  if (/HTML(.*)Element/.test(item.constructor.name))
-		this._dom.appendChild(item)
-	  else if (item.constructor.name == 'DOM' && (/HTML(.*)Element/.test(item._dom)))
-		this._dom.appendChild(item._dom)
-	})
+	  DOMS.forEach ((item) => {
+	    if (/HTML(.*)Element/.test(item.constructor.name))
+		  this._dom.appendChild(item)
+	    else if (item.constructor.name == 'DOM' && (/HTML(.*)Element/.test(item._dom)))
+		  this._dom.appendChild(item._dom)
+	  })
 
-	return this
+	  return this
+  }
+  removeChilds () {
+    let child = this._dom.lastElementChild
+    while (child) {
+      this._dom.removeChild(child)
+      child = this._dom.lastElementChild
+    }
   }
 }
 

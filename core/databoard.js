@@ -2,7 +2,7 @@
 "use strict";
 
 import {Actions, Action} from './action.js'
-import {Charts, Streams} from './plugins.js'
+import {Charts, Streams, Switches} from './plugins.js'
 import {DOM, Animate} from './dom.js'
 import {DataStorage, StorageManager} from './datastorage.js'
 export {Workspaces}
@@ -32,6 +32,7 @@ class Grid {
 	constructor (dom){
 		this.players = []
 		this.charts = []
+		this.switches = []
 		this.uid_streams = []
 		this.editingStream = '';
 		this.isDragging = false;
@@ -77,8 +78,6 @@ class Grid {
 	}
 
 	add (type){
-		if (this.uid_streams.length >= 9)
-			return false
 		if (typeof localStorage['currentWorkspace'] == 'undefined')
 			modules.Workspaces.add()
 
@@ -91,13 +90,14 @@ class Grid {
 	}
 	include (uid){
 	  let data = JSON.parse (localStorage[`stream:${uid}`]);
+
 	  switch (data.type) {
 	    case 'chart':
 	      console.log('Including chart.js')
 
 	      let chart = new DOM('canvas', {className:'chart'})
 	      let remove1 = new DOM('button', {
-			    'className':'icon notext',
+			    'className':'icon notext ',
 			    'id':'remove',
 			    'title':'Remove chart'
 			    })
@@ -107,20 +107,16 @@ class Grid {
 				    remove1,
 				    chart
 			    ])
-			  let container1 = new DOM('div', {'id':uid})
+			  let container1 = new DOM('div', {id:uid, className:'chart'})
 			    .append(content1)
-
-		    let $1 = this._dom
 
 		    this.muuri.add(container1._dom)
 
-		    let index1 = this.charts.length
 		    this.charts.push (Charts.chart(uid, chart._dom))
 
 	      chart.onclick(this, this.edit, [uid, chart._dom, this])
 		    break
 	    case 'stream':
-
 		    localStorage.setItem (`stream:${uid}`,JSON.stringify(data))
 
 
@@ -136,18 +132,41 @@ class Grid {
 				    remove2,
 				    video
 			    ])
-			  let container2 = new DOM('div', {'id':uid})
+			  let container2 = new DOM('div', {id:uid, className:'stream'})
 			    .append(content2)
 
 
-		    let $2 = this._dom
-
 		    this.muuri.add(container2._dom)
 
-		    let index2 = this.players.length;
 		    this.players.push (Streams.stream(uid, video._dom))
 
         video.onclick(this, this.edit, [uid, video._dom, this]);
+		    break
+		  case 'switch':
+		    localStorage.setItem (`stream:${uid}`,JSON.stringify(data))
+
+
+		    let _switch = new DOM('span')
+		    let remove3 = new DOM('button', {
+			    'className':'icon notext',
+			    'id':'remove',
+			    'title':'Remove stream'
+			    })
+		      .onclick(this, this.remove, [uid]);
+		    let content3 = new DOM('div')
+			    .append([
+				    remove3,
+				    _switch
+			    ])
+			  let container3 = new DOM('div', {id:uid, className:'switch'})
+			    .append(content3)
+
+
+		    this.muuri.add(container3._dom)
+
+		    this.switches.push (Switches.switch(uid, _switch))
+
+        _switch.onclick(this, this.edit, [uid, _switch, this]);
 		    break
 		  }
 		  localStorage.setItem(`workspace:${JSON.parse(localStorage['currentWorkspace'])}`, JSON.stringify(this.uid_streams))
@@ -210,21 +229,21 @@ class Grid {
 		  console.log(`Editing stream ${uid}`)
 
 		  this.muuri.getItems().forEach((item) => {
-			  if(item._element.className =='on')
-				  item._element.className = ''
+			  if(item._element.classList.contains('on'))
+				  item._element.classList.remove('on')
 		  })
 		  if (uid == this.editingStream) {
 			  this._dom.grid._dom.classList.remove('on')
 			  this.editingStream = ''
 			  this.muuri.getItems().forEach((item) => {
 				  if(item._element.id == uid)
-					  item._element.className = ''
+					  item._element.classList.remove('on')
 			  })
 		  } else {
 			  this._dom.grid._dom.classList.add('on')
 			  this.muuri.getItems().forEach((item) => {
 				  if(item._element.id == uid)
-					  item._element.className = 'on'
+					  item._element.classList.add('on')
 			  })
 			  this.actions.show(uid, target, obj)
 			  this.editingStream = uid
@@ -477,7 +496,8 @@ class AddMenu {
   constructor (dom, grid_ref){
     this.plugins = {
       chart:'Chart',
-      stream:'Stream'
+      stream:'Stream',
+      switch: 'Switch'
     }
 
 

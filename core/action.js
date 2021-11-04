@@ -1,8 +1,8 @@
 "use strict";
 
 import {DOM} from './dom.js'
-import {Charts, Streams} from './plugins.js'
-export {Actions, Action}
+import {Charts, Streams, Switches} from './plugins.js'
+export {Actions, Action, Get}
 
 class Actions {
 	constructor (dom){
@@ -34,6 +34,26 @@ class Actions {
 	}
 	build (type){
 	  switch (type){
+	    case 'switch':
+	      return {
+	        title: {
+	          type: 'input',
+	          value: 'My button'
+	        },
+	        subtitle: {
+	          type: 'input',
+	          value: ''
+	        },
+	        onUrl: {
+	          type: 'input',
+	          value: ''
+	        },
+	        offUrl: {
+	          type: 'input',
+	          value: ''
+	        }
+	      }
+	      break
 	    case 'stream':
 	      return {
 	        source: {
@@ -91,6 +111,12 @@ class Actions {
 
 	static dict (plugin, key){
 	  let _dict = {
+	    'switch': {
+	      title: 'Title',
+	      subtitle: 'Subtitle',
+	      onUrl: 'URL on',
+	      offUrl: 'URL off',
+	    },
 	    'chart': {
 	      dataset: 'Topic',
 	      chartType: ['Chart type', ['line','scatter','bar','pie','radar']],
@@ -207,7 +233,20 @@ class Action {
 
           		Streams.manifest(obj, data.setup, this.uid)
               break
-			    }
+		    }
+	      case 'switch':
+			    switch (this.key){
+			      case 'title':
+			      case 'subtitle':
+			      case 'onUrl':
+			      case 'offUrl':
+              data.setup[this.key].value = str,
+          		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
+
+          		Switches.regen(obj, this.uid, this.dom)
+			        break
+			    break
+			  }
 			}
 	}
 	dropdown (obj) {
@@ -244,19 +283,32 @@ class Action {
 		let switch_ = this.currentValue == 1 ? 0 : 1
 
 	}
-	getRequest (request_, callback){
-		let request = new Request (request_)
-
-		fetch(request)
-			.then(response => response.json())
-			.then(data => {
-				if (!data.hasOwnProperty('response'))
-					return
-				if (typeof callback != 'undefined' && data.response != -1)
-					callback(data.response)
-			})
-			.catch(console.error)
-	}
 }
 
+class Get {
+  constructor (){}
 
+  static request(request_, callback, json){
+		let request = new Request (request_)
+
+    if (json) {
+		  fetch(request)
+			  .then(response => response.json())
+			  .then(data => {
+				  if (!data.hasOwnProperty('response'))
+					  return
+				  if (typeof callback != 'undefined' && data.response != -1)
+					  callback(data.response)
+			  })
+			  .catch(
+			    console.error
+			  )
+		} else {
+				fetch(request)
+			  .then(callback())
+			  .catch(
+			    console.error
+			  )
+		}
+	}
+}

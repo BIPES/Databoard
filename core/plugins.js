@@ -1,6 +1,8 @@
 "use strict";
 
-export {Charts, Streams}
+import {DOM} from './dom.js'
+import {Get} from './action.js'
+export {Charts, Streams, Switches}
 
 
 class Charts {
@@ -140,4 +142,60 @@ class Streams {
         });
 	}
 	/*ENDREVIEW*/
+}
+
+class Switches {
+  constructor (uid, dom, onUrl, offUrl){
+    this.uid = uid
+    this.dom = dom
+    this.onUrl = onUrl
+    this.offUrl = offUrl
+    this.state = false
+  }
+  destroy () {
+    this.onUrl = ''
+    this.offUrl = ''
+    this.state = false
+    this.dom.removeChilds()
+
+    delete this
+  }
+  command () {
+    if (!this.state)
+      Get.request(this.onUrl, () => {
+        this.dom._dom.classList.add('on')
+        this.state = true
+      })
+    else
+      Get.request(this.offUrl, () => {
+        this.dom._dom.classList.remove('on')
+        this.state = false
+      })
+  }
+  static switch (uid, dom) {
+    let data = JSON.parse(localStorage[`stream:${uid}`])
+
+    let _Switches = new Switches (uid, dom, data.setup.onUrl.value, data.setup.offUrl.value)
+
+    let title = new DOM('h2', {innerText: data.setup.title.value}),
+     subtitle = new DOM('h3', {innerText: data.setup.subtitle.value}),
+       button = new DOM ('div', {id: 'switchPlugin', tabIndex: 0})
+        .onclick(_Switches, _Switches.command)
+
+    dom.append ([
+      title,
+      button,
+      subtitle
+      ])
+
+    return _Switches
+  }
+  static regen (obj, uid, dom) {
+    for (const index in obj.switches) {
+      if (obj.switches[index].uid == uid) {
+        obj.switches[index].destroy ()
+        obj.switches[index] = Switches.switch(uid, dom)
+      }
+    }
+  }
 }

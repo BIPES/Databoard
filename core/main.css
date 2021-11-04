@@ -164,6 +164,9 @@ button#download:before {
 .icon#chartButton:before {
   background-position: left calc(-1.5rem*29) top;
 }
+.icon#switchButton:before {
+  background-position: left calc(-1.5rem*30) top;
+}
 section {
 	position: absolute;
 	width: 100vw;
@@ -364,7 +367,7 @@ section #dashboard.on #grid #add {
 	color: #fff
 }
 #grid #actions .range {
-    width: 100%;
+  width: 100%;
 	display: block;
 	padding: .5em;
 	text-align: center;
@@ -392,11 +395,11 @@ input:focus {
 	padding: 0.5rem;
 	box-sizing:border-box;
 	display: flex;
-    flex-direction: column;
+  flex-direction: column;
 
-    height: 100vh;
+  height: 100vh;
 	overflow-x: hidden;
-    overflow-y: auto;
+  overflow-y: auto;
 	scrollbar-width: none;
 }
 #dashboard.on #grid.on #actions {
@@ -499,7 +502,7 @@ input:focus {
   opacity: 1;
 }
 #addMenu > div {
-  max-width: 10em;
+  max-width: 14em;
   padding: 0.5em;
   display: flex;
   justify-content: space-around;
@@ -582,4 +585,51 @@ input:focus {
 }
 .dragging {
   z-index: 999;
+}
+#switchPlugin {
+  width: 50%;
+  height: 50%;
+  background: #eee;
+  border-radius: 100%;
+  box-shadow: 0 1px 1px rgb(0, 0, 0);
+  border: 1px solid #666;
+  transition: box-shadow ease .125s, margin-bottom ease .125s, background-color ease .125s;
+  cursor: pointer;
+}
+
+#switchPlugin:hover {
+  box-shadow: 0 3px 3px rgb(0, 0, 0);
+  margin-bottom: 2px;
+}
+#switchPlugin:active {
+  box-shadow: 0 0 0 rgb(0, 0, 0);
+  margin-bottom: -2px;
+}
+.muuri-item.switch span.on #switchPlugin{
+  background-color: #3298dc;
+}
+.muuri-item.switch > div > span {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  align-content: space-between;
+  justify-content: space-between;
+}
+.muuri-item.switch {
+  width: 11rem !important;
+  height: 11rem !important;
+}
+.muuri-item.switch h2, .muuri-item.switch h3 {
+  font-weight: normal;
+  padding: 0.25em 0;
+  color: #666;
+  height: 1.25rem;
+}
+.muuri-item.switch h2 {
+  font-size: 1em;
+}
+.muuri-item.switch h3 {
+  font-size: 0.8em;
 }

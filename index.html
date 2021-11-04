@@ -2,8 +2,8 @@
 
 <head>
 	<title>BIPES Databoard</title>
-	<link rel="stylesheet" href='./core/main.css?ver=0.2.3.10310209' />
-	<script type="module" src="./core/databoard.js?ver=0.2.3.10310209"></script>
+	<link rel="stylesheet" href='./core/main.css?ver=0.2.3.1104' />
+	<script type="module" src="./core/databoard.js?ver=0.2.3.1104"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/muuri@0.9.5/dist/muuri.min.js"></script>
@@ -19,6 +19,7 @@
 <script>
   //Out of module to be accessible by BIPES
   var modules = {}
+
   function initDataStorage () {
     modules.Workspaces.init()
     modules.DataStorage.init(modules.Workspaces.grid)
