@@ -4,12 +4,12 @@ preview
 }
 body {
   border-top: 1px solid #ccc;
+  user-select: none;
 }
 body, input {
   font: 1em sans-serif;
   margin: 0;
   overflow: hidden;
-  user-select: none;
   box-sizing: border-box;
 }
 form input, form textarea, form select, button {
@@ -167,6 +167,9 @@ button#download:before {
 .icon#switchButton:before {
   background-position: left calc(-1.5rem*30) top;
 }
+.button#drag:before {
+	background-position: left calc(-1.5rem*31) top;
+}
 section {
 	position: absolute;
 	width: 100vw;
@@ -204,31 +207,19 @@ section #dashboard {
 	display: flex;
 	height: 100vh;
 }
-section #dashboard #workspaces{
-	transition: .25s ease width;
+#dashboard #workspaces{
+	transition: .25s ease width, .25s ease height;
 	position: absolute;
-	right:0;
 	z-index:12;
 	background: #fff;
-	width: 4rem;
-	height: 100%;
 }
 #grid {
-	grid-column: 1;
-	grid-row: 1;
-	width: calc(100% - 4em);
 	transition: .25s ease width;
 	overflow-y: scroll;
 	overflow-x: hidden;
 }
-#workspaces {
-	grid-column: 2;
-	grid-row: 1;
-}
 #workspaces > div {
-    overflow-y: auto;
     display: block;
-    height: calc(100vh - 10rem);
 }
 #workspaces span > div, #workspaces #edit, #workspaces #add{
 	box-sizing: border-box;
@@ -256,29 +247,16 @@ section #dashboard #workspaces{
   height: 100%;
 	cursor: pointer;
 }
-#dashboard.on #workspaces {
-	width: 6.5rem;
-}
 #grid button#remove, #dashboard #add {
 	display: none
 }
 #dashboard.on #add{
   display:flex
 }
-/*
-
-#dashboard.scrollView #grid.on > span > div {
-  width: calc(90vw - 11em) !important;
-}
-#dashboard.scrollView #grid #remove {
-  position: relative;
-  margin: 0 0 -2.75em 0;
-}*/
 #grid #add {
 	z-index: 12;
 	display: block !important;
   position: absolute;
-  right: 8.5rem;
   bottom: -5em;
   border: 1px solid #000;
   padding: .75em;
@@ -286,9 +264,6 @@ section #dashboard #workspaces{
 	transition: .25s ease box-shadow, .25s ease margin-bottom, .25s ease bottom;
 }
 
-section #dashboard.on #grid #add {
-    bottom: .5em;
-}
 #grid #add:hover {
 	margin-bottom: .25em;
   box-shadow: 0 .125em .25em rgba(0, 0, 0, 0.5);
@@ -297,14 +272,7 @@ section #dashboard.on #grid #add {
 	position: relative;
 	height: calc(100vh - 3.5em);
 	width: 100%;
-}/*
-#grid.on {
-  width: calc(100% - 16em);
-}*/
-#dashboard.on #grid.on{
-  width: calc(100% - 18.5em);
 }
-
 #grid button {
 	background: #fff;
 	z-index: 1;
@@ -316,14 +284,10 @@ section #dashboard.on #grid #add {
 	border-left: 1px solid #ccc;
 	box-sizing: border-box;
 	position:absolute;
-	right: 4em;
 	background: #fff;
 	height:100%;
 	z-index:11;
 	overflow:hidden;
-}
-#dashboard.on #actions {
-  right: 6.5rem;
 }
 #grid.on #actions {
 	border-right: 1px solid #ccc;
@@ -392,10 +356,12 @@ input:focus {
 #grid #actions > span {
 	display: block;
 	width: 12rem;
+	height: 100%;
 	padding: 0.5rem;
 	box-sizing:border-box;
 	display: flex;
   flex-direction: column;
+	padding-bottom: 4em;
 
   height: 100vh;
 	overflow-x: hidden;
@@ -405,41 +371,6 @@ input:focus {
 #dashboard.on #grid.on #actions {
 	width: 12em;
 }
-
-/*
-#grid span.s1 {
-	grid-template-columns: 1fr;
-	grid-template-rows: 1fr;
-}
-@media (orientation:landscape) {
-  #grid span.s2 {
-	  grid-template-columns: 1fr 1fr;
-	  grid-template-rows: 1fr;
-	}
-  #grid span.s5, #grid span.s6 {
-	  grid-template-columns: 1fr 1fr 1fr;
-	  grid-template-rows: 1fr 1fr;
-  }
-}
-@media (orientation:portrait) {
-  #grid span.s2 {
-	  grid-template-columns: 1fr;
-	  grid-template-rows: 1fr 1fr;
-	}
-  #grid span.s5, #grid span.s6 {
-	  grid-template-columns: 1fr 1fr;
-	  grid-template-rows: 1fr 1fr 1fr;
-  }
-}
-#grid span.s3, #grid span.s4 {
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows: 1fr 1fr;
-}
-#grid span.s7, #grid span.s8, #grid span.s9 {
-	grid-template-columns: 1fr 1fr 1fr;
-	grid-template-rows: 1fr 1fr 1fr;
-}
-*/
 #storageManager, #addMenu {
   display: none;
   position: absolute;
@@ -454,6 +385,10 @@ input:focus {
 }
 #storageManager.on, #addMenu.on{
   background: rgba(0,0,0,.1);
+}
+#storageManager {
+  padding: .5em;
+  box-sizing: border-box;
 }
 #storageManager > div {
   max-width: 30em;
@@ -481,6 +416,7 @@ input:focus {
   align-items: center;
   border-bottom: 1px solid #ccc;
   padding: 0.25em 0;
+  user-select: text;
 }
 #storageManager span > div:last-child {
   border-bottom: none;
@@ -498,7 +434,6 @@ input:focus {
   display: flex;
 }
 #addMenu.on > div {
-  margin-top: calc(100vh - 5.25em);
   opacity: 1;
 }
 #addMenu > div {
@@ -506,7 +441,6 @@ input:focus {
   padding: 0.5em;
   display: flex;
   justify-content: space-around;
-  margin-right: 8.5em;
   margin-left: auto;
 }
 #addMenu button {
@@ -529,11 +463,11 @@ input:focus {
   margin: .5em 0;
 }
 
-.muuri > div {
-  width: 33rem;
-  height: 22rem;
+.muuri-item {
+  width: 22.5rem;
+  height: 15rem;
   position: absolute;
-  padding: 1rem;
+  padding: 0.5rem;
   box-sizing: border-box;
 }
 .muuri > div > div {
@@ -559,9 +493,23 @@ input:focus {
   position: absolute;
   border: 1px solid #000;
   padding: .25em;
-	margin: -.75em;
+	margin: -.5em;
 	transition: .25s ease box-shadow, .25s ease background-color;
 	background: #fff;
+}
+.muuri #drag {
+  position: absolute;
+  border: 1px solid #ddd;
+  border-radius: 0 1em;
+  padding: 1em;
+	margin: 0em;
+	background: #fff;
+	margin-top: -3.5em;
+  margin-left: -1px;
+  display: none;
+}
+.muuri #drag:before {
+  opacity: 0.6;
 }
 .muuri #remove:hover:before {
   filter: invert(1)
@@ -570,10 +518,7 @@ input:focus {
 	background: #000 !important;
 	box-shadow: 0 0 .25em rgba(0, 0, 0, 0.5);
 }
-#dashboard.on #grid {
-  width: calc(100% - 6.5rem);
-}
-#dashboard.on button#remove {
+#dashboard.on button#remove, #dashboard.on .button#drag {
 	display: block
 }
 #dashboard.scrollView .muuri > div {
@@ -587,12 +532,12 @@ input:focus {
   z-index: 999;
 }
 #switchPlugin {
-  width: 50%;
-  height: 50%;
-  background: #eee;
+  width: 2em;
+  height: 2em;
+  background: #D1EDFF;
   border-radius: 100%;
   box-shadow: 0 1px 1px rgb(0, 0, 0);
-  border: 1px solid #666;
+  border: .25em solid #3298dc;
   transition: box-shadow ease .125s, margin-bottom ease .125s, background-color ease .125s;
   cursor: pointer;
 }
@@ -604,6 +549,9 @@ input:focus {
 #switchPlugin:active {
   box-shadow: 0 0 0 rgb(0, 0, 0);
   margin-bottom: -2px;
+}
+.muuri-item.switch > div > span {
+  overflow: hidden;
 }
 .muuri-item.switch span.on #switchPlugin{
   background-color: #3298dc;
@@ -618,18 +566,132 @@ input:focus {
   justify-content: space-between;
 }
 .muuri-item.switch {
-  width: 11rem !important;
-  height: 11rem !important;
+  width: 7.5rem !important;
+  height: 7.5rem !important;
 }
 .muuri-item.switch h2, .muuri-item.switch h3 {
   font-weight: normal;
   padding: 0.25em 0;
   color: #666;
   height: 1.25rem;
+  white-space: nowrap;
 }
 .muuri-item.switch h2 {
-  font-size: 1em;
+  font-size: 0.9em;
 }
 .muuri-item.switch h3 {
   font-size: 0.8em;
+}
+@media (orientation: landscape) {
+  #workspaces {
+    width: 4rem;
+    height: 100%;
+    right: 0
+  }
+  #workspaces > div {
+    overflow-y: auto;
+    height: calc(100vh - 10rem);
+  }
+  #dashboard.on #workspaces {
+	  width: 6.5rem;
+  }
+  #dashboard.on #grid {
+    width: calc(100% - 6.5rem);
+  }
+  #grid {
+    width: calc(100% - 4em);
+  }
+  #grid #add {
+    right: 8.5rem;
+  }
+  #dashboard.on #grid #add {
+    bottom: .5em;
+  }
+  #addMenu > div {
+    margin-right: 8.5em;
+  }
+  #addMenu.on > div {
+    margin-top: calc(100vh - 5.25em);
+  }
+  #dashboard.on #grid.on{
+    width: calc(100% - 18.5em);
+  }
+  #dashboard.on #actions {
+    right: 6.5rem;
+  }
+  #grid #actions {
+	  right: 4em;
+	}
+}
+@media (orientation: portrait) {
+  #grid {
+    width: 100%;
+    height: calc(100% - 3.5rem);
+  }
+  #grid #actions {
+    right: 0;
+    height: calc(100% - 3.5em)
+  }
+  #grid #actions > span {
+    height: 100%;
+  }
+  #workspaces {
+    width: 100vw;
+    height: 3.5rem;
+    bottom: 0;
+    position:absolute;
+    display:flex;
+    border-top: 1px solid #ccc;
+  }
+  #workspaces > div {
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: calc(100vw - 10.5rem);
+    display: flex;
+  }
+  #workspaces > span {
+    display: flex;
+    border-left: 1px solid #ccc;
+  }
+  #workspaces > span > div {
+    width: 3em;
+  }
+  #workspaces > div > span {
+    display: inline-flex;
+  }
+  #workspaces > div > span > div {
+    transition: .25s ease background-color, width ease .25s;
+    width: 3em;
+  }
+  #dashboard.on #workspaces > div > span > div {
+    width: 6em;
+  }
+  #workspaces #add {
+    min-width: 3em;
+  }
+  #grid #add {
+    right: .5rem;
+  }
+  #dashboard.on #grid #add {
+    bottom: 4em;
+  }
+  #addMenu > div {
+    margin-right: .5em;
+  }
+  #addMenu.on > div {
+    margin-top: calc(100vh - 8.75em);
+  }
+  #dashboard.on #grid.on{
+    width: calc(100% - 12em);
+  }
+  #dashboard.scrollView .muuri > div {
+    width: 100%;
+    height: calc(100vh - 3.5em);
+  }
+}
+
+@media only screen and (max-width: 20em) {
+  .muuri-item {
+    max-width: 15rem;
+  }
 }

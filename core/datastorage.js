@@ -292,6 +292,10 @@ class StorageManager {
                 lines[index][index2] = lines[index][index2].replaceAll('"', '')
             })
           })
+          // remove empty lines or with only one column
+          lines = lines.filter((line) => {
+              return line.length > 1
+          });
 
           if (!localStorage.hasOwnProperty(`datastorage:${dataname}`))
             localStorage.setItem(`datastorage:${dataname}`, JSON.stringify(lines))
@@ -308,7 +312,6 @@ class StorageManager {
           }
           this.deinit()
           this.restore()
-          console.log(dataname, lines, typeof lines[0][0], typeof lines[0][1])
 
           _upload.value = ''
         }

@@ -48,12 +48,16 @@ class Grid {
 
 		this.muuri = new Muuri($.container._dom, {
 		  dragEnabled: true,
+		  dragHandle: '#drag',
 		  dragStartPredicate: (item, e) => {
-		    if (this._dom.grid._dom.classList.contains('edit') && e.deltaTime > 100){
+		    if (this._dom.grid._dom.classList.contains('edit')){
 		      this.isDragging = true
 		      return true
 		    }
-		  } ,
+		  }
+		  /*dragCssProps: {
+        touchAction: 'pan-y',
+      }8?
 		  /*layout: {
 		    alignRight: true
 		  }*/
@@ -91,21 +95,27 @@ class Grid {
 	include (uid){
 	  let data = JSON.parse (localStorage[`stream:${uid}`]);
 
+    let drag  = new DOM('div', {
+      className:'button icon notext',
+      id:'drag',
+      title:'Drag me'
+    })
+    let remove = new DOM('button', {
+      className:'button icon notext',
+      id:'remove',
+      title:'Remove stream'
+    })
+	  .onclick(this, this.remove, [uid]);
 	  switch (data.type) {
 	    case 'chart':
 	      console.log('Including chart.js')
 
 	      let chart = new DOM('canvas', {className:'chart'})
-	      let remove1 = new DOM('button', {
-			    'className':'icon notext ',
-			    'id':'remove',
-			    'title':'Remove chart'
-			    })
-		      .onclick(this, this.remove, [uid]);
 		    let content1 = new DOM('div')
 			    .append([
-				    remove1,
-				    chart
+				    remove,
+				    chart,
+				    drag
 			    ])
 			  let container1 = new DOM('div', {id:uid, className:'chart'})
 			    .append(content1)
@@ -121,16 +131,11 @@ class Grid {
 
 
 		    let video = new DOM('video', {'preload':'auto','controls':'','autoplay':''})
-		    let remove2 = new DOM('button', {
-			    'className':'icon notext',
-			    'id':'remove',
-			    'title':'Remove stream'
-			    })
-		      .onclick(this, this.remove, [uid]);
 		    let content2 = new DOM('div')
 			    .append([
-				    remove2,
-				    video
+				    remove,
+				    video,
+				    drag
 			    ])
 			  let container2 = new DOM('div', {id:uid, className:'stream'})
 			    .append(content2)
@@ -145,18 +150,12 @@ class Grid {
 		  case 'switch':
 		    localStorage.setItem (`stream:${uid}`,JSON.stringify(data))
 
-
 		    let _switch = new DOM('span')
-		    let remove3 = new DOM('button', {
-			    'className':'icon notext',
-			    'id':'remove',
-			    'title':'Remove stream'
-			    })
-		      .onclick(this, this.remove, [uid]);
 		    let content3 = new DOM('div')
 			    .append([
-				    remove3,
-				    _switch
+				    remove,
+				    _switch,
+				    drag
 			    ])
 			  let container3 = new DOM('div', {id:uid, className:'switch'})
 			    .append(content3)
