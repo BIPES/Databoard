@@ -143,6 +143,9 @@ nav a:hover {
 button#remove:before {
 	background-position: left calc(-1.5rem*3) top;
 }
+button#dismiss:before {
+	background-position: left calc(-1.5rem*24) top;
+}
 button#lower:before {
 	background-position: left calc(-1.5rem*24) top;
 }
@@ -489,36 +492,35 @@ input:focus {
 	border-color: #3298dc;
 	z-index: 10
 }
-.muuri #remove {
+.muuri #dismiss {
   position: absolute;
-  border: 1px solid #000;
-  padding: .25em;
+  padding: .125em;
 	margin: -.5em;
-	transition: .25s ease box-shadow, .25s ease background-color;
-	background: #fff;
+	transition: .25s ease background-color;
+	background: #999;
+	display: none;
 }
 .muuri #drag {
   position: absolute;
   border: 1px solid #ddd;
   border-radius: 0 1em;
-  padding: 1em;
+  padding: 0.75em;
 	margin: 0em;
 	background: #fff;
-	margin-top: -3.5em;
+	margin-top: -3em;
   margin-left: -1px;
   display: none;
 }
 .muuri #drag:before {
   opacity: 0.6;
 }
-.muuri #remove:hover:before {
+.muuri #dismiss:before{
   filter: invert(1)
 }
-.muuri #remove:hover {
+.muuri #dismiss:hover {
 	background: #000 !important;
-	box-shadow: 0 0 .25em rgba(0, 0, 0, 0.5);
 }
-#dashboard.on button#remove, #dashboard.on .button#drag {
+#dashboard.on button#dismiss, #dashboard.on .button#drag {
 	display: block
 }
 #dashboard.scrollView .muuri > div {

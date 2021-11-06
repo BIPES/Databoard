@@ -102,8 +102,8 @@ class Grid {
     })
     let remove = new DOM('button', {
       className:'button icon notext',
-      id:'remove',
-      title:'Remove stream'
+      id:'dismiss',
+      title:'Dismiss plugin'
     })
 	  .onclick(this, this.remove, [uid]);
 	  switch (data.type) {

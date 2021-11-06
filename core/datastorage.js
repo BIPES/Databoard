@@ -12,6 +12,7 @@ class DataStorage {
     this.gridObj
   }
   init (gridObj) {
+    console.log("DataStorage Inited")
     this.gridObj = gridObj
   }
   push (dataset, coordinates) {
