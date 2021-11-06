@@ -9,7 +9,7 @@ class Charts {
   constructor (){}
   static chart (uid, dom) {
 		let data = JSON.parse(localStorage[`stream:${uid}`])
-		let data2 = modules.DataStorage.chartData(data.setup.dataset.value, data);
+		let data2 = modules.DataStorage.chartData(data.setup.dataset, data);
 
 		let options = {
 		            plugins: {
@@ -26,28 +26,28 @@ class Charts {
                 resizeDelay: 125
               }
 
-		if (data.setup.title.value != '')
-		  options.plugins.title = {display: true, text: data.setup.title.value, font: {size: 14}}
+		if (data.setup.title != '')
+		  options.plugins.title = {display: true, text: data.setup.title, font: {size: 14}}
 
-    if (data.setup.timeseries.value)
+    if (data.setup.timeseries)
 		  options.scales.xAxes = {type: 'time', distribution: 'linear'}
 
-		if (data.setup.xLabel.value != '')
-		  options.scales.x = {display: true, title:{display: true, text: data.setup.xLabel.value}}
-		if (data.setup.yLabel.value != '')
-		  options.scales.y = {beginAtZero: true, display: true, title:{display: true, text: data.setup.yLabel.value}}
+		if (data.setup.xLabel != '')
+		  options.scales.x = {display: true, title:{display: true, text: data.setup.xLabel}}
+		if (data.setup.yLabel != '')
+		  options.scales.y = {beginAtZero: true, display: true, title:{display: true, text: data.setup.yLabel}}
 		else
 		  options.scales.y = {beginAtZero: true}
 
     let _chart = new Chart(dom, {
-		        type: data.setup.chartType.value,
+		        type: data.setup.chartType,
 		        data: data2,
 		        options: options
 		  })
 
     _chart.uid = uid
-    _chart.dataset = data.setup.dataset.value
-    let limitPoints = parseInt(data.setup.limitPoints.value)
+    _chart.dataset = data.setup.dataset
+    let limitPoints = parseInt(data.setup.limitPoints)
     if (!isNaN(limitPoints))
         _chart.limitPoints = limitPoints
 
@@ -74,14 +74,14 @@ class Streams {
   constructor (){}
   static stream (uid, dom) {
     let data = JSON.parse(localStorage[`stream:${uid}`])
-    switch (data.setup.source.value) {
+    switch (data.setup.source) {
       case 'DASH':
         let _stream1 = dashjs.MediaPlayer().create()
         _stream1.uid = uid
         _stream1.source = 'DASH'
         _stream1.updateSettings({ 'streaming': { 'lowLatencyEnabled': true } })
 
-        _stream1.initialize(dom, data.setup.manifest.value, true)
+        _stream1.initialize(dom, data.setup.manifest, true)
         Streams.dashApplyParamenters(_stream1)
         return _stream1
         break
@@ -93,7 +93,7 @@ class Streams {
             dom.src = src
           }
         }
-        _stream2.attachSource (data.setup.manifest.value)
+        _stream2.attachSource (data.setup.manifest)
         return _stream2
         break
     }
@@ -114,7 +114,7 @@ class Streams {
         switch (obj.players[index].source) {
           case "DASH":
           case "MJPEG":
-            obj.players[index].attachSource(setup.manifest.value)
+            obj.players[index].attachSource(setup.manifest)
             obj.players[index].uid = uid
             break
         }
@@ -175,10 +175,10 @@ class Switches {
   static switch (uid, dom) {
     let data = JSON.parse(localStorage[`stream:${uid}`])
 
-    let _Switches = new Switches (uid, dom, data.setup.onUrl.value, data.setup.offUrl.value)
+    let _Switches = new Switches (uid, dom, data.setup.onUrl, data.setup.offUrl)
 
-    let title = new DOM('h2', {innerText: data.setup.title.value}),
-     subtitle = new DOM('h3', {innerText: data.setup.subtitle.value}),
+    let title = new DOM('h2', {innerText: data.setup.title}),
+     subtitle = new DOM('h3', {innerText: data.setup.subtitle}),
        button = new DOM ('div', {id: 'switchPlugin', tabIndex: 0})
         .onclick(_Switches, _Switches.command)
 

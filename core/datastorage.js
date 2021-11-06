@@ -12,7 +12,6 @@ class DataStorage {
     this.gridObj
   }
   init (gridObj) {
-    console.log("DataStorage Inited")
     this.gridObj = gridObj
   }
   push (dataset, coordinates) {
@@ -54,13 +53,13 @@ class DataStorage {
       return arr.slice();
     });
 
-	  let limitPoints = parseInt(opt.setup.limitPoints.value)
+	  let limitPoints = parseInt(opt.setup.limitPoints)
     if (!isNaN(limitPoints))
       mat = mat.slice(-limitPoints)
 
     this.transpose (mat)
 
-    let labels = opt.setup.labels.value.split(',').map((i)=>i.trim())
+    let labels = opt.setup.labels.split(',').map((i)=>i.trim())
     labels = labels.length == 1 && labels[0] == '' ? [] : labels
 
     let datasets = [];
@@ -314,7 +313,7 @@ class StorageManager {
           this.deinit()
           this.restore()
 
-          _upload.value = ''
+          _upload = ''
         }
       }
     }

@@ -17,7 +17,6 @@ class Actions {
 		this.init(uid, dom, obj)
 	}
 	init (uid, dom, obj){
-		/*ajax request of availbles methods per stream*/
 		let stream = JSON.parse(localStorage[`stream:${uid}`])
 		for (const key in stream.setup) {
 			let _action = new Action(stream.setup[key], stream.type, key, uid, dom, obj)
@@ -32,78 +31,59 @@ class Actions {
 		});
 		this.actions = []
 	}
-	build (type){
-	  switch (type){
+	static _getType (plugin, key){
+	  let _dict = {
+	    'switch': {
+	      title: 'input',
+	      subtitle: 'input',
+	      onUrl: 'input',
+	      offUrl: 'input',
+	    },
+	    'chart': {
+	      dataset: 'input',
+	      chartType: 'dropdown',
+	      title: 'input',
+	      source: 'dropdown',
+	      labels: 'input',
+	      timeseries: 'switch',
+	      limitPoints: 'input',
+	      xLabel: 'input',
+	      yLabel: 'input'
+	    },
+	    'stream': {
+	      source: 'dropdown',
+	      manifest: 'input'
+	    }
+	  }
+	  return _dict[plugin][key]
+	}
+	static defaults (plugin){
+	  switch (plugin){
 	    case 'switch':
 	      return {
-	        title: {
-	          type: 'input',
-	          value: 'My button'
-	        },
-	        subtitle: {
-	          type: 'input',
-	          value: ''
-	        },
-	        onUrl: {
-	          type: 'input',
-	          value: ''
-	        },
-	        offUrl: {
-	          type: 'input',
-	          value: ''
+	        title: 'My button',
+	        subtitle: '',
+	        onUrl: '',
+	        offUrl: ''
 	        }
-	      }
 	      break
 	    case 'stream':
 	      return {
-	        source: {
-	          type: 'dropdown',
-	          value: 'DASH'
-	        },
-	        manifest: {
-	          type: 'input',
-	          value: 'https://livesim.dashif.org/livesim/chunkdur_1/ato_7/testpic4_8s/Manifest300.mpd'
-	        }
+	        source:'DASH',
+	        manifest: 'https://livesim.dashif.org/livesim/chunkdur_1/ato_7/testpic4_8s/Manifest300.mpd'
 	      }
 	      break
 	    case 'chart':
         return {
-          source: {
-            type: 'dropdown',
-            value: 'localStorage'
-          },
-          dataset: {
-            type: 'input',
-            value: 'data'
-          },
-          chartType: {
-            type: 'dropdown',
-            value: 'line'
-          },
-          title: {
-            type: 'input',
-            value: ''
-          },
-          labels: {
-            type: 'input',
-            value: 'Variable 1, Variable 2'
-          },
-          limitPoints: {
-            type: 'input',
-            value: '100'
-          },
-          xLabel: {
-            type: 'input',
-            value: ''
-          },
-          yLabel: {
-            type: 'input',
-            value: ''
-          },
-          timeseries: {
-            type: 'switch',
-            value: false
-          }
+          source: 'localStorage',
+          dataset:'data',
+          chartType: 'line',
+          title: '',
+          labels: 'Variable 1, Variable 2',
+          limitPoints: '100',
+          xLabel: '',
+          yLabel: '',
+          timeseries: false
         }
 	      break
 	  }
@@ -144,7 +124,7 @@ class Action {
 	  this.dom = dom
 
 		let $ = this._dom = {}
-		switch (action.type) {
+		switch (Actions._getType(plugin, key)) {
 			case 'button':
 				$.action = new DOM('div', {className:'button'})
 				$.button = new DOM('button', {innerText:Actions.dict(plugin,key), className:'noicon'})
@@ -154,13 +134,13 @@ class Action {
 			case 'input':
 				$.action = new DOM('div', {className:'input'})
 				$.span = new DOM('span', {innerText:Actions.dict(plugin,key)})
-				$.input = new DOM('input', {value:action.value})
+				$.input = new DOM('input', {value:action})
 				  .onchange(this, this.input, [obj])
 				$.action.append([$.span, $.input])
 				break
 			case 'switch':
 				$.action = new DOM('div', {
-				  className:action.value ? 'switch on' : 'switch'
+				  className:action ? 'switch on' : 'switch'
 				})
 				$.button = new DOM('button', {
 				  innerText:Actions.dict(plugin,key),
@@ -173,7 +153,7 @@ class Action {
 			  let source = Actions.dict(plugin,key),
 			    index = 0;
 			  for (let i = 0; i < source[1].length; i++){
-			    if (source[1][i] == action.value) {
+			    if (source[1][i] == action) {
 			      index = i
 			      break
 			    }
@@ -193,15 +173,15 @@ class Action {
 	}
   switch (obj) {
       let data = JSON.parse(localStorage[`stream:${this.uid}`])
-      data.setup.timeseries.value = !data.setup.timeseries.value
-			this._dom.action._dom.className = data.setup.timeseries.value ? 'switch on' : 'switch'
+      data.setup.timeseries = !data.setup.timeseries
+			this._dom.action._dom.className = data.setup.timeseries ? 'switch on' : 'switch'
 
 			switch(this.plugin){
 			  case 'chart':
 			    switch (this.key){
 			      case 'timeseries':
           		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
-          		Charts.regen(obj, data.setup.dataset.value, this.uid, this.dom)
+          		Charts.regen(obj, data.setup.dataset, this.uid, this.dom)
           		break
           }
       }
@@ -218,17 +198,17 @@ class Action {
 			      case 'xLabel':
 			      case 'yLabel':
 			      case 'limitPoints':
-              data.setup[this.key].value = str,
+              data.setup[this.key] = str,
           		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
 
-          		Charts.regen(obj, data.setup.dataset.value, this.uid, this.dom)
+          		Charts.regen(obj, data.setup.dataset, this.uid, this.dom)
 			        break
 			    break
 			  }
 			  case 'stream':
 			    switch (this.key){
 			      case 'manifest':
-              data.setup.manifest.value = str,
+              data.setup.manifest = str,
           		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
 
           		Streams.manifest(obj, data.setup, this.uid)
@@ -240,7 +220,7 @@ class Action {
 			      case 'subtitle':
 			      case 'onUrl':
 			      case 'offUrl':
-              data.setup[this.key].value = str,
+              data.setup[this.key] = str,
           		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
 
           		Switches.regen(obj, this.uid, this.dom)
@@ -256,22 +236,22 @@ class Action {
 		  case 'chart':
 		    switch (this.key){
 		      case 'source':
-            data.setup.source.value = str,
+            data.setup.source = str,
         		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
 
-        		Charts.regen(obj, data.setup.dataset.value, this.uid, this.dom)
+        		Charts.regen(obj, data.setup.dataset, this.uid, this.dom)
         		break
 		      case 'chartType':
-            data.setup.chartType.value = str,
+            data.setup.chartType = str,
         		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
 
-        		Charts.regen(obj, data.setup.dataset.value, this.uid, this.dom)
+        		Charts.regen(obj, data.setup.dataset, this.uid, this.dom)
 		        break
    		}
    		case 'stream':
    		  switch (this.key){
    		    case 'source':
-            data.setup.source.value = str,
+            data.setup.source = str,
         		localStorage.setItem(`stream:${this.uid}`, JSON.stringify(data))
 
             Streams.regen(obj, data.setup, this.uid, this.dom)

@@ -88,12 +88,21 @@ class Grid {
 		let uid = UID ()
 		this.uid_streams.push(uid)
 
-		localStorage.setItem (`stream:${uid}`,JSON.stringify({'type':type, 'setup': this.actions.build(type)}))
+		localStorage.setItem (`stream:${uid}`,JSON.stringify({'type':type, 'setup': Actions.defaults(type)}))
 
 		this.include(uid)
 	}
 	include (uid){
 	  let data = JSON.parse (localStorage[`stream:${uid}`]);
+	  /*TOREMOVECompatibility layer*/
+		if(((data.type == 'switch' || data.type == 'chart') && typeof data.setup.title.type != 'undefined') || (data.type == 'stream' && typeof data.setup.manifest.type != 'undefined')) {
+		  for (const key in data.setup) {
+		    data.setup[key] = data.setup[key].value
+		  }
+		  localStorage.setItem(`stream:${uid}`,JSON.stringify(data));
+		  console.log('Compatibility layer trigerred')
+		}
+		/*TOREMOVE*/
 
     let drag  = new DOM('div', {
       className:'button icon notext',
