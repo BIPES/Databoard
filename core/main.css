@@ -3,7 +3,6 @@ preview
     -webkit-tap-highlight-color: transparent;
 }
 body {
-  border-top: 1px solid #ccc;
   user-select: none;
 }
 body, input {
